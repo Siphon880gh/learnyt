@@ -76,9 +76,11 @@
 }
 
 /* Native details summary marker hide for cleaner UI */
-#workflow details > summary::-webkit-details-marker {
+#workflow details > summary::-webkit-details-marker,
+#import details > summary::-webkit-details-marker {
   display: none;
 }
-#workflow details > summary {
+#workflow details > summary,
+#import details > summary {
   list-style: none;
 }

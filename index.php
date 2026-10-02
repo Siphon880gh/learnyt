@@ -77,24 +77,30 @@ layout_header('Home', array('nav' => 'home'));
 </section>
 
 <section id="import" class="mx-auto max-w-3xl px-4 sm:px-6 pb-12">
-  <h2 class="text-xl font-semibold text-slate-900 mb-2">Import lesson JSON</h2>
-  <p class="text-sm text-slate-600 mb-4">
-    Secondary path (not a YouTube URL form). Paste JSON from the harness or upload a <code class="text-slate-800">.json</code> file.
-    Stored in this browser until you Sync to demo. Cannot overwrite the seed id <code class="text-slate-800">sample-spaced-rep</code>.
-  </p>
-  <div class="rounded-xl border border-slate-200 bg-white p-5 space-y-4">
-    <label class="block text-sm font-medium text-slate-700" for="import-file">Upload file</label>
-    <input id="import-file" type="file" accept="application/json,.json" class="block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-slate-900 file:px-3 file:py-1.5 file:text-sm file:text-white">
-    <label class="block text-sm font-medium text-slate-700" for="import-json">Or paste JSON</label>
-    <textarea id="import-json" rows="6" placeholder='{ "video": { "id": "...", "title": "..." }, "transcript": [], ... }'
-      class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900"></textarea>
-    <div class="flex flex-wrap gap-2">
-      <button type="button" id="btn-import-lesson" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900">
-        Save to this browser
-      </button>
-      <span id="import-status" class="text-sm text-slate-500 self-center" role="status"></span>
+  <details class="group rounded-xl border border-slate-200 bg-white open:shadow-sm">
+    <summary class="cursor-pointer list-none flex items-center justify-between gap-3 px-5 py-4 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 rounded-xl">
+      <span class="text-xl font-semibold text-slate-900">Import lesson JSON</span>
+      <span class="text-sm text-slate-500 group-open:hidden">Show</span>
+      <span class="text-sm text-slate-500 hidden group-open:inline">Hide</span>
+    </summary>
+    <div class="px-5 pb-5 border-t border-slate-100 pt-4 space-y-4">
+      <p class="text-sm text-slate-600">
+        Secondary path (not a YouTube URL form). Paste JSON from the harness or upload a <code class="text-slate-800">.json</code> file.
+        Stored in this browser until you Sync to demo. Cannot overwrite the seed id <code class="text-slate-800">sample-spaced-rep</code>.
+      </p>
+      <label class="block text-sm font-medium text-slate-700" for="import-file">Upload file</label>
+      <input id="import-file" type="file" accept="application/json,.json" class="block w-full text-sm text-slate-600 file:mr-3 file:rounded-md file:border-0 file:bg-slate-900 file:px-3 file:py-1.5 file:text-sm file:text-white">
+      <label class="block text-sm font-medium text-slate-700" for="import-json">Or paste JSON</label>
+      <textarea id="import-json" rows="6" placeholder='{ "video": { "id": "...", "title": "..." }, "transcript": [], ... }'
+        class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm font-mono text-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900"></textarea>
+      <div class="flex flex-wrap gap-2">
+        <button type="button" id="btn-import-lesson" class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900">
+          Save to this browser
+        </button>
+        <span id="import-status" class="text-sm text-slate-500 self-center" role="status"></span>
+      </div>
     </div>
-  </div>
+  </details>
 </section>
 
 <section class="mx-auto max-w-3xl px-4 sm:px-6 pb-20">
