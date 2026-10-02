@@ -10,6 +10,11 @@ define('LEARNYT_DATA', LEARNYT_ROOT . '/data');
 define('LEARNYT_LESSONS', LEARNYT_DATA . '/lessons');
 define('LEARNYT_HIGHLIGHTS', LEARNYT_DATA . '/highlights');
 define('LEARNYT_SRS_FILE', LEARNYT_DATA . '/srs.json');
+define('LEARNYT_DEMO', LEARNYT_DATA . '/demo');
+define('LEARNYT_DEMO_LESSONS', LEARNYT_DEMO . '/lessons');
+define('LEARNYT_DEMO_HIGHLIGHTS', LEARNYT_DEMO . '/highlights');
+define('LEARNYT_DEMO_SRS_FILE', LEARNYT_DEMO . '/srs.json');
+define('LEARNYT_SEED_IDS', 'sample-spaced-rep'); // comma-separated protected seed ids
 
 // --- PHP 8.0 string helper polyfills (for PHP 7.4 / MAMP) ---
 if (!function_exists('str_starts_with')) {
@@ -102,9 +107,10 @@ require_once __DIR__ . '/helpers.php';
 require_once __DIR__ . '/LessonRepository.php';
 require_once __DIR__ . '/HighlightRepository.php';
 require_once __DIR__ . '/SrsEngine.php';
+require_once __DIR__ . '/DemoSync.php';
 
 // Ensure data dirs exist
-foreach ([LEARNYT_DATA, LEARNYT_LESSONS, LEARNYT_HIGHLIGHTS] as $dir) {
+foreach ([LEARNYT_DATA, LEARNYT_LESSONS, LEARNYT_HIGHLIGHTS, LEARNYT_DEMO, LEARNYT_DEMO_LESSONS, LEARNYT_DEMO_HIGHLIGHTS] as $dir) {
     if (!is_dir($dir)) {
         mkdir($dir, 0755, true);
     }

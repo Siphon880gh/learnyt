@@ -23,6 +23,20 @@ Open http://localhost:8080 — a sample lesson is included so the UI is demoable
 
 Requirements: **PHP 7.4+** (works with MAMP 7.4; polyfills for PHP 8 string helpers). Optional for the skill: **yt-dlp** on PATH (Homebrew: `brew install yt-dlp`).
 
+
+## Dual storage (browser → Sync to demo)
+
+1. **Seed** — `data/lessons/sample-spaced-rep.json` is committed and always listed (badge: Sample).
+2. **Import** — paste/upload lesson JSON on the home page into **localStorage** (`learnyt_user_lessons_v1`). Badge: On this browser. Cannot overwrite the seed id.
+3. **Sync to demo** — button prompts for a password. PHP validates `SYNC_DEMO_PASSWORD` from `.env` (local demo password: **`go`**). On success, writes gitignored `data/demo/lessons/{id}.json` (plus highlights/SRS under `data/demo/`). Badge: Synced demo. **Any visitor of this app URL can open synced lessons.** Wrong password: no files written.
+4. Seed folder `data/lessons/` is never written by sync.
+
+Set in `.env` (gitignored):
+
+```
+SYNC_DEMO_PASSWORD=go
+```
+
 ## Harness workflow (6 steps)
 
 1. Open this folder in an AI coding harness with local tools.

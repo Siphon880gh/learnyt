@@ -67,6 +67,7 @@ function layout_footer(array $opts = []): void
       <p><a class="underline hover:text-slate-800" href="README.md">Docs</a></p>
     </div>
   </footer>
+  <script src="assets/js/storage.js" defer></script>
   <script src="assets/js/app.js" defer></script>
   <?php foreach ($scripts as $src): ?>
   <script src="<?= e($src) ?>" defer></script>

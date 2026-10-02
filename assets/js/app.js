@@ -15,6 +15,12 @@
     clearTimeout(el._t);
     el._t = setTimeout(() => el.classList.add('hidden'), 2200);
   }
+  window.LearnytToast = toast;
+
+  function useLocalStore() {
+    const cfg = window.LEARNYT || {};
+    return window.LearnytStorage && window.LearnytStorage.usesLocalPersistence(cfg);
+  }
 
   async function api(url, opts = {}) {
     const res = await fetch(url, {
@@ -221,26 +227,41 @@
           toast('Deep link copied');
         } else if (action === 'highlight') {
           if (!text) return toast('Select text first');
-          const data = await api('api/highlights.php', {
-            method: 'POST',
-            body: JSON.stringify({ videoId: cfg.videoId, text, start, end, segmentId }),
-          });
-          appendHighlight(data.highlight);
-          toast('Highlight saved');
+          if (useLocalStore()) {
+            const highlight = window.LearnytStorage.addHighlight(cfg.videoId, {
+              text, start, end, segmentId,
+            });
+            appendHighlight(highlight);
+            toast('Highlight saved (this browser)');
+          } else {
+            const data = await api('api/highlights.php', {
+              method: 'POST',
+              body: JSON.stringify({ videoId: cfg.videoId, text, start, end, segmentId }),
+            });
+            appendHighlight(data.highlight);
+            toast('Highlight saved');
+          }
         } else if (action === 'srs') {
           if (!text) return toast('Select text first');
-          await api('api/srs.php', {
-            method: 'POST',
-            body: JSON.stringify({
-              text,
-              videoId: cfg.videoId,
-              start,
-              end,
-              segmentId,
-              sourceType: 'highlight',
-            }),
-          });
-          toast('Saved to SRS');
+          if (useLocalStore()) {
+            window.LearnytStorage.addSrs({
+              text, videoId: cfg.videoId, start, end, segmentId, sourceType: 'highlight',
+            });
+            toast('Saved to SRS (this browser)');
+          } else {
+            await api('api/srs.php', {
+              method: 'POST',
+              body: JSON.stringify({
+                text,
+                videoId: cfg.videoId,
+                start,
+                end,
+                segmentId,
+                sourceType: 'highlight',
+              }),
+            });
+            toast('Saved to SRS');
+          }
         }
       } catch (err) {
         toast(err.message || 'Error');
@@ -292,25 +313,34 @@
       try {
         if (del) {
           const id = del.getAttribute('data-delete-hl');
-          await api('api/highlights.php', {
-            method: 'DELETE',
-            body: JSON.stringify({ videoId: cfg.videoId, id }),
-          });
+          if (useLocalStore()) {
+            window.LearnytStorage.deleteHighlight(cfg.videoId, id);
+          } else {
+            await api('api/highlights.php', {
+              method: 'DELETE',
+              body: JSON.stringify({ videoId: cfg.videoId, id }),
+            });
+          }
           del.closest('[data-hl-id]')?.remove();
           toast('Highlight deleted');
         }
         if (srsBtn) {
           const card = srsBtn.closest('[data-hl-id]');
           const text = card?.querySelector('p')?.textContent?.trim() || '';
-          await api('api/srs.php', {
-            method: 'POST',
-            body: JSON.stringify({
-              text,
-              videoId: cfg.videoId,
-              sourceType: 'highlight',
-            }),
-          });
-          toast('Saved to SRS');
+          if (useLocalStore()) {
+            window.LearnytStorage.addSrs({ text, videoId: cfg.videoId, sourceType: 'highlight' });
+            toast('Saved to SRS (this browser)');
+          } else {
+            await api('api/srs.php', {
+              method: 'POST',
+              body: JSON.stringify({
+                text,
+                videoId: cfg.videoId,
+                sourceType: 'highlight',
+              }),
+            });
+            toast('Saved to SRS');
+          }
         }
       } catch (err) {
         toast(err.message || 'Error');
@@ -378,17 +408,20 @@
         e.preventDefault();
         const cfg = window.LEARNYT || {};
         try {
-          await api('api/srs.php', {
-            method: 'POST',
-            body: JSON.stringify({
-              text: a.getAttribute('data-srs-title'),
-              videoId: cfg.videoId,
-              start: Number(a.getAttribute('data-seek') || 0),
-              sourceType: 'learn',
-              sourceTitle: a.getAttribute('data-srs-title'),
-            }),
-          });
-          toast('Learning topic saved to SRS');
+          const payload = {
+            text: a.getAttribute('data-srs-title'),
+            videoId: cfg.videoId,
+            start: Number(a.getAttribute('data-seek') || 0),
+            sourceType: 'learn',
+            sourceTitle: a.getAttribute('data-srs-title'),
+          };
+          if (useLocalStore()) {
+            window.LearnytStorage.addSrs(payload);
+            toast('Learning topic saved to SRS (this browser)');
+          } else {
+            await api('api/srs.php', { method: 'POST', body: JSON.stringify(payload) });
+            toast('Learning topic saved to SRS');
+          }
         } catch (err) {
           toast(err.message || 'Error');
         }
@@ -476,6 +509,9 @@
   }
 
   document.addEventListener('DOMContentLoaded', () => {
+    if (window.LearnytStorage && window.LEARNYT && window.LEARNYT.hydrateLocal) {
+      window.LearnytStorage.hydrateLessonPage();
+    }
     initToc();
     initSelectionToolbar();
     initHighlights();

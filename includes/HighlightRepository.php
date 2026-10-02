@@ -6,28 +6,40 @@ declare(strict_types=1);
  */
 final class HighlightRepository
 {
-    public function listForVideo(string $videoId): array
+    public function listForVideo($videoId)
     {
-        $path = $this->path($videoId);
-        $data = json_read($path, ['highlights' => []]);
-        return is_array($data['highlights'] ?? null) ? $data['highlights'] : [];
+        $path = $this->resolveReadPath($videoId);
+        $data = json_read($path, array('highlights' => array()));
+        return is_array(isset($data['highlights']) ? $data['highlights'] : null) ? $data['highlights'] : array();
     }
 
-    public function listAll(): array
+    public function listAll()
     {
-        $files = glob(LEARNYT_HIGHLIGHTS . '/*.json') ?: [];
-        $all = [];
+        $files = array_merge(
+            glob(LEARNYT_HIGHLIGHTS . '/*.json') ?: array(),
+            glob(LEARNYT_DEMO_HIGHLIGHTS . '/*.json') ?: array()
+        );
+        $all = array();
+        $seen = array();
         foreach ($files as $file) {
-            $data = json_read($file, ['highlights' => []]);
-            $items = $data['highlights'] ?? [];
-            if (is_array($items)) {
-                foreach ($items as $h) {
-                    $all[] = $h;
+            $data = json_read($file, array('highlights' => array()));
+            $items = isset($data['highlights']) ? $data['highlights'] : array();
+            if (!is_array($items)) {
+                continue;
+            }
+            foreach ($items as $h) {
+                $hid = isset($h['id']) ? $h['id'] : null;
+                if ($hid && isset($seen[$hid])) {
+                    continue;
                 }
+                if ($hid) {
+                    $seen[$hid] = true;
+                }
+                $all[] = $h;
             }
         }
         usort($all, static function ($a, $b) {
-            return strcmp((string) ($b['created'] ?? ''), (string) ($a['created'] ?? ''));
+            return strcmp((string) (isset($b['created']) ? $b['created'] : ''), (string) (isset($a['created']) ? $a['created'] : ''));
         });
         return $all;
     }
@@ -109,9 +121,32 @@ final class HighlightRepository
         return true;
     }
 
-    private function path(string $videoId): string
+    private function path($videoId)
     {
-        $id = (new LessonRepository())->sanitizeId($videoId);
+        $id = (new LessonRepository())->sanitizeId((string) $videoId);
         return LEARNYT_HIGHLIGHTS . '/' . $id . '.json';
     }
+
+    private function demoPath($videoId)
+    {
+        $id = (new LessonRepository())->sanitizeId((string) $videoId);
+        return LEARNYT_DEMO_HIGHLIGHTS . '/' . $id . '.json';
+    }
+
+    /**
+     * Resolve store path: writable highlights/ first, else demo copy.
+     */
+    private function resolveReadPath($videoId)
+    {
+        $primary = $this->path($videoId);
+        if (is_readable($primary)) {
+            return $primary;
+        }
+        $demo = $this->demoPath($videoId);
+        if (is_readable($demo)) {
+            return $demo;
+        }
+        return $primary;
+    }
 }
+

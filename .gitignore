@@ -2,10 +2,17 @@
 vendor/
 .DS_Store
 *.log
+
+# Runtime / user write stores (not seed lessons)
 data/srs.json
 data/highlights/*.json
 !data/highlights/.gitkeep
 !data/.gitkeep
-# Keep sample lessons tracked; ignore generated ones if desired:
-# data/lessons/*.json
-# !data/lessons/sample-*.json
+
+# Synced demo lessons (public on this server, not committed — like Storyflow data/)
+data/demo/**
+!data/demo/.gitkeep
+!data/demo/lessons/.gitkeep
+!data/demo/highlights/.gitkeep
+
+# Seed lessons under data/lessons/ stay tracked (e.g. sample-spaced-rep.json)

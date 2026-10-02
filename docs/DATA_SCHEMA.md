@@ -2,6 +2,10 @@
 
 All lesson data is local JSON under `data/`. No database required for MVP.
 
+- **Seed (committed):** `data/lessons/{id}.json`
+- **Browser drafts:** `localStorage` keys `learnyt_user_lessons_v1`, `learnyt_highlights_v1`, `learnyt_srs_v1`
+- **Synced demo (gitignored, public on this server):** `data/demo/lessons/{id}.json` via Sync to demo (`api/sync_demo.php`, password in `.env`)
+
 ## Lesson file
 
 **Path:** `data/lessons/{videoId}.json`

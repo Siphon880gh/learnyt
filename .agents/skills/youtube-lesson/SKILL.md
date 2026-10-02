@@ -25,11 +25,20 @@ Confirm the video ID before writing files.
 
 ## Outputs
 
-Write:
+Prefer producing lesson JSON the user can **Import** on the Learnyt home page (browser localStorage). Optionally also write a file for convenience:
+
+```
+data/lessons/{videoId}.json   # only if asked; do not overwrite sample-spaced-rep
+```
+
+Product path: harness JSON → user Import (localStorage) → optional **Sync to demo** (gitignored `data/demo/lessons/`, server password).
+
+Still valid to write:
 
 ```
 data/lessons/{videoId}.json
 ```
+when the user wants a seed-style file in the repo — never overwrite `sample-spaced-rep`.
 
 Optionally seed:
 

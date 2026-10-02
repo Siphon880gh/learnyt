@@ -8,15 +8,30 @@ $repo = new LessonRepository();
 $videoId = (string) ($_GET['v'] ?? '');
 $lesson = $repo->find($videoId);
 
+$isLocalShell = false;
 if ($lesson === null) {
-    http_response_code(404);
-    layout_header('Lesson not found', ['nav' => 'home']);
-    echo '<div class="mx-auto max-w-3xl px-4 sm:px-6 py-20 text-center">';
-    echo '<h1 class="text-2xl font-semibold text-slate-900 mb-3">Lesson not found</h1>';
-    echo '<p class="text-slate-600 mb-6">No lesson JSON for <code class="bg-slate-100 px-1 rounded">' . e($videoId) . '</code>.</p>';
-    echo '<a class="text-slate-900 underline" href="index.php">Back to lessons</a></div>';
-    layout_footer();
-    exit;
+    // Not on disk (seed/demo). Render a shell; app.js hydrates from localStorage if present.
+    $isLocalShell = true;
+    $sanitized = $repo->sanitizeId($videoId);
+    if ($sanitized === '') {
+        http_response_code(404);
+        layout_header('Lesson not found', array('nav' => 'home'));
+        echo '<div class="mx-auto max-w-3xl px-4 sm:px-6 py-20 text-center">';
+        echo '<h1 class="text-2xl font-semibold text-slate-900 mb-3">Invalid lesson id</h1>';
+        echo '<a class="text-slate-900 underline" href="index.php">Back to lessons</a></div>';
+        layout_footer();
+        exit;
+    }
+    $videoId = $sanitized;
+    $lesson = array(
+        'video' => array('id' => $videoId, 'title' => 'Loading…', 'channel' => '', 'duration' => 0),
+        'meta' => array('summary' => ''),
+        'transcript' => array(),
+        'chronologicalToc' => array(),
+        'learningToc' => array(),
+        'diagrams' => array(),
+        '_source' => 'local',
+    );
 }
 
 $video = $lesson['video'] ?? [];
@@ -41,13 +56,27 @@ if (!preg_match('/^[A-Za-z0-9_-]{11}$/', $embedId)) {
     $embedId = preg_match('/^[A-Za-z0-9_-]{11}$/', $videoId) ? $videoId : '';
 }
 
-layout_header($title, ['nav' => 'home']);
+$lessonSource = isset($lesson['_source']) ? (string) $lesson['_source'] : ($isLocalShell ? 'local' : (string) $repo->sourceOf($videoId));
+if ($lessonSource === '') {
+    $lessonSource = 'seed';
+}
+
+layout_header($title, array('nav' => 'home'));
 ?>
 <div class="border-b border-slate-200 bg-white">
   <div class="mx-auto max-w-6xl px-4 sm:px-6 py-4">
     <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div class="min-w-0">
-        <p class="text-xs uppercase tracking-wide text-slate-500 mb-1">Lesson</p>
+        <p class="text-xs uppercase tracking-wide text-slate-500 mb-1">
+          Lesson
+          <?php if ($lessonSource === 'seed'): ?>
+          <span class="ml-2 inline-flex items-center rounded-full bg-emerald-50 text-emerald-800 px-2 py-0.5 text-[10px] font-semibold tracking-wide normal-case">Sample</span>
+          <?php elseif ($lessonSource === 'demo'): ?>
+          <span class="ml-2 inline-flex items-center rounded-full bg-sky-50 text-sky-800 px-2 py-0.5 text-[10px] font-semibold tracking-wide normal-case">Synced demo</span>
+          <?php elseif ($isLocalShell || $lessonSource === 'local'): ?>
+          <span class="ml-2 inline-flex items-center rounded-full bg-amber-50 text-amber-900 px-2 py-0.5 text-[10px] font-semibold tracking-wide normal-case">On this browser</span>
+          <?php endif; ?>
+        </p>
         <h1 class="text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 truncate"><?= e($title) ?></h1>
         <p class="mt-1 text-sm text-slate-500">
           <?= e($video['channel'] ?? '') ?>
@@ -84,7 +113,7 @@ layout_header($title, ['nav' => 'home']);
 </div>
 
 <div class="mx-auto max-w-6xl px-4 sm:px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8"
-     id="lesson-app"
+     id="lesson-app" data-hydrate-local="<?= $isLocalShell ? '1' : '0' ?>"
      data-video-id="<?= e($videoId) ?>"
      data-start="<?= (int) $embedStart ?>"
      data-seg="<?= e($segParam) ?>"
@@ -182,6 +211,11 @@ layout_header($title, ['nav' => 'home']);
 
   <!-- Main reading column -->
   <div class="lg:col-span-7 xl:col-span-8 space-y-10 min-w-0">
+    <?php if ($isLocalShell): ?>
+    <div id="local-hydrate-status" class="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+      Looking for this lesson in browser storage…
+    </div>
+    <?php endif; ?>
     <section id="overview-panel" class="rounded-xl border border-slate-200 bg-white p-6 sm:p-8">
       <h2 class="text-lg font-semibold text-slate-900 mb-3">Overview</h2>
       <?php if (!empty($lesson['meta']['summary'])): ?>
@@ -321,7 +355,9 @@ layout_header($title, ['nav' => 'home']);
     seg: <?= json_encode($segParam) ?>,
     hl: <?= json_encode($hlParam) ?>,
     dg: <?= json_encode($dgParam) ?>,
-    toc: <?= json_encode($tocMode) ?>
+    toc: <?= json_encode($tocMode) ?>,
+    source: <?= json_encode($lessonSource) ?>,
+    hydrateLocal: <?= $isLocalShell ? 'true' : 'false' ?>
   };
 </script>
 <!-- YouTube IFrame API -->
