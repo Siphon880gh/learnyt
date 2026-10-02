@@ -499,6 +499,125 @@
     }
   }
 
+  function initDiagramLightbox() {
+    let root = document.getElementById('diagram-lightbox');
+    if (!root) {
+      root = document.createElement('div');
+      root.id = 'diagram-lightbox';
+      root.className = 'diagram-lightbox';
+      root.hidden = true;
+      root.setAttribute('role', 'dialog');
+      root.setAttribute('aria-modal', 'true');
+      root.setAttribute('aria-labelledby', 'diagram-lightbox-title');
+      root.innerHTML =
+        '<div class="diagram-lightbox-backdrop" data-lb-close></div>' +
+        '<div class="diagram-lightbox-panel" role="document">' +
+        '<div class="diagram-lightbox-toolbar">' +
+        '<h2 id="diagram-lightbox-title" class="diagram-lightbox-title">Diagram</h2>' +
+        '<div class="diagram-lightbox-actions">' +
+        '<button type="button" class="diagram-lightbox-btn" data-lb-zoom="out" aria-label="Zoom out">−</button>' +
+        '<button type="button" class="diagram-lightbox-btn" data-lb-zoom="reset" aria-label="Reset zoom">100%</button>' +
+        '<button type="button" class="diagram-lightbox-btn" data-lb-zoom="in" aria-label="Zoom in">+</button>' +
+        '<button type="button" class="diagram-lightbox-btn diagram-lightbox-close" data-lb-close aria-label="Close enlarged diagram">Close</button>' +
+        '</div></div>' +
+        '<div class="diagram-lightbox-stage-wrap"><div class="diagram-lightbox-stage" id="diagram-lightbox-stage"></div></div>' +
+        '</div>';
+      document.body.appendChild(root);
+    }
+
+    const stage = root.querySelector('#diagram-lightbox-stage');
+    const titleEl = root.querySelector('#diagram-lightbox-title');
+    const closeBtn = root.querySelector('.diagram-lightbox-close');
+    let scale = 1.35;
+    let lastFocus = null;
+
+    function applyScale() {
+      stage.style.transform = 'scale(' + scale + ')';
+    }
+
+    function openFrom(body) {
+      const card = body.closest('.diagram-card') || body.closest('figure');
+      const cap = card && card.querySelector('figcaption');
+      titleEl.textContent = (cap && cap.textContent.trim()) || 'Diagram';
+      stage.innerHTML = '';
+      const clone = body.cloneNode(true);
+      clone.removeAttribute('role');
+      clone.removeAttribute('tabindex');
+      clone.classList.add('diagram-lightbox-clone');
+      stage.appendChild(clone);
+      scale = 1.35;
+      applyScale();
+      lastFocus = document.activeElement;
+      root.hidden = false;
+      document.body.classList.add('diagram-lightbox-open');
+      closeBtn.focus();
+    }
+
+    function close() {
+      if (root.hidden) return;
+      root.hidden = true;
+      stage.innerHTML = '';
+      document.body.classList.remove('diagram-lightbox-open');
+      if (lastFocus && typeof lastFocus.focus === 'function') {
+        lastFocus.focus();
+      }
+    }
+
+    function markBodies() {
+      document.querySelectorAll('.diagram-body').forEach((body) => {
+        if (body.dataset.lbReady === '1') return;
+        body.dataset.lbReady = '1';
+        body.setAttribute('role', 'button');
+        body.setAttribute('tabindex', '0');
+        if (!body.getAttribute('aria-label')) {
+          body.setAttribute('aria-label', 'Enlarge diagram');
+        }
+      });
+    }
+
+    markBodies();
+
+    document.addEventListener('click', (e) => {
+      const closeHit = e.target.closest('[data-lb-close]');
+      if (closeHit && root.contains(closeHit)) {
+        close();
+        return;
+      }
+      const zoomBtn = e.target.closest('[data-lb-zoom]');
+      if (zoomBtn && root.contains(zoomBtn) && !root.hidden) {
+        const mode = zoomBtn.getAttribute('data-lb-zoom');
+        if (mode === 'in') scale = Math.min(3, Math.round((scale + 0.25) * 100) / 100);
+        else if (mode === 'out') scale = Math.max(0.5, Math.round((scale - 0.25) * 100) / 100);
+        else scale = 1.35;
+        applyScale();
+        return;
+      }
+      if (e.target.closest('a, button')) return;
+      const body = e.target.closest('.diagram-body');
+      if (!body || root.contains(body)) return;
+      e.preventDefault();
+      openFrom(body);
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !root.hidden) {
+        e.preventDefault();
+        close();
+        return;
+      }
+      const body = e.target.closest && e.target.closest('.diagram-body');
+      if (!body || root.contains(body)) return;
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        openFrom(body);
+      }
+    });
+
+    // Hydrated diagrams may appear before this runs; mermaid may replace nodes after.
+    setTimeout(markBodies, 400);
+    setTimeout(markBodies, 1600);
+  }
+
   function initDiagrams() {
     const cfg = window.LEARNYT || {};
     document.querySelectorAll('[data-diagram-jump]').forEach((a) => {
@@ -544,6 +663,7 @@
     initReview();
     initMermaid();
     initDiagrams();
+    initDiagramLightbox();
     // If YT API already loaded
     if (typeof YT !== 'undefined' && YT.Player && !ytPlayer) {
       window.onYouTubeIframeAPIReady();

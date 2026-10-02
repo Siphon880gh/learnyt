@@ -105,3 +105,126 @@
 #import details > summary {
   list-style: none;
 }
+
+
+/* Diagram lightbox */
+.diagram-body {
+  cursor: zoom-in;
+}
+
+.diagram-body:focus-visible {
+  outline: 2px solid rgb(15 23 42);
+  outline-offset: 2px;
+}
+
+body.diagram-lightbox-open {
+  overflow: hidden;
+}
+
+.diagram-lightbox[hidden] {
+  display: none !important;
+}
+
+.diagram-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.diagram-lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgb(15 23 42 / 0.55);
+}
+
+.diagram-lightbox-panel {
+  position: relative;
+  z-index: 1;
+  width: min(1100px, 100%);
+  max-height: calc(100vh - 2rem);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(226 232 240);
+  box-shadow: 0 20px 50px rgb(15 23 42 / 0.25);
+}
+
+.diagram-lightbox-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgb(226 232 240);
+}
+
+.diagram-lightbox-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: rgb(15 23 42);
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.diagram-lightbox-actions {
+  display: flex;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.diagram-lightbox-btn {
+  border: 1px solid rgb(203 213 225);
+  background: #fff;
+  color: rgb(15 23 42);
+  border-radius: 0.375rem;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  cursor: pointer;
+}
+
+.diagram-lightbox-btn:hover {
+  background: rgb(248 250 252);
+}
+
+.diagram-lightbox-btn:focus-visible {
+  outline: 2px solid rgb(15 23 42);
+  outline-offset: 2px;
+}
+
+.diagram-lightbox-stage-wrap {
+  overflow: auto;
+  padding: 1.25rem;
+  max-height: calc(100vh - 7rem);
+  background: rgb(248 250 252);
+}
+
+.diagram-lightbox-stage {
+  transform-origin: top center;
+  display: flex;
+  justify-content: center;
+}
+
+.diagram-lightbox-clone,
+.diagram-lightbox-clone svg,
+.diagram-lightbox-clone img,
+.diagram-lightbox-clone .mermaid {
+  max-width: none;
+}
+
+.diagram-lightbox-clone svg,
+.diagram-lightbox-clone img {
+  width: min(920px, 100%);
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  background: #fff;
+}
