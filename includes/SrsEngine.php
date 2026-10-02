@@ -25,7 +25,9 @@ final class SrsEngine
             $next = strtotime((string) ($item['nextReview'] ?? '1970-01-01'));
             return $next !== false && $next <= $now;
         });
-        usort($due, static fn($a, $b) => strcmp((string) $a['nextReview'], (string) $b['nextReview']));
+        usort($due, static function ($a, $b) {
+            return strcmp((string) $a['nextReview'], (string) $b['nextReview']);
+        });
         return array_values($due);
     }
 
@@ -58,10 +60,18 @@ final class SrsEngine
             }
         }
 
-        usort($overdue, static fn($a, $b) => strcmp((string) $a['nextReview'], (string) $b['nextReview']));
-        usort($dueToday, static fn($a, $b) => strcmp((string) $a['nextReview'], (string) $b['nextReview']));
-        usort($upcoming, static fn($a, $b) => strcmp((string) $a['nextReview'], (string) $b['nextReview']));
-        usort($recent, static fn($a, $b) => strcmp((string) ($b['created'] ?? ''), (string) ($a['created'] ?? '')));
+        usort($overdue, static function ($a, $b) {
+            return strcmp((string) $a['nextReview'], (string) $b['nextReview']);
+        });
+        usort($dueToday, static function ($a, $b) {
+            return strcmp((string) $a['nextReview'], (string) $b['nextReview']);
+        });
+        usort($upcoming, static function ($a, $b) {
+            return strcmp((string) $a['nextReview'], (string) $b['nextReview']);
+        });
+        usort($recent, static function ($a, $b) {
+            return strcmp((string) ($b['created'] ?? ''), (string) ($a['created'] ?? ''));
+        });
 
         return [
             'dueToday' => $dueToday,
@@ -153,7 +163,9 @@ final class SrsEngine
         $before = count($store['items']);
         $store['items'] = array_values(array_filter(
             $store['items'],
-            static fn($i) => ($i['id'] ?? '') !== $id
+            static function ($i) use ($id) {
+                return ($i['id'] ?? '') !== $id;
+            }
         ));
         if (count($store['items']) === $before) {
             return false;
@@ -249,7 +261,9 @@ final class SrsEngine
                 ];
             }
         }
-        usort($events, static fn($a, $b) => strcmp((string) ($b['at'] ?? ''), (string) ($a['at'] ?? '')));
+        usort($events, static function ($a, $b) {
+            return strcmp((string) ($b['at'] ?? ''), (string) ($a['at'] ?? ''));
+        });
         return array_slice($events, 0, $limit);
     }
 

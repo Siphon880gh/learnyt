@@ -26,7 +26,9 @@ final class HighlightRepository
                 }
             }
         }
-        usort($all, static fn($a, $b) => strcmp((string) ($b['created'] ?? ''), (string) ($a['created'] ?? '')));
+        usort($all, static function ($a, $b) {
+            return strcmp((string) ($b['created'] ?? ''), (string) ($a['created'] ?? ''));
+        });
         return $all;
     }
 
@@ -96,7 +98,9 @@ final class HighlightRepository
         $before = count($store['highlights']);
         $store['highlights'] = array_values(array_filter(
             $store['highlights'],
-            static fn($h) => ($h['id'] ?? '') !== $id
+            static function ($h) use ($id) {
+                return ($h['id'] ?? '') !== $id;
+            }
         ));
         if (count($store['highlights']) === $before) {
             return false;

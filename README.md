@@ -14,7 +14,7 @@ php -S localhost:8080
 
 Open http://localhost:8080 — a sample lesson is included so the UI is demoable immediately.
 
-Requirements: **PHP 8+**. Optional for the skill: **yt-dlp** on PATH (Homebrew: `brew install yt-dlp`).
+Requirements: **PHP 7.4+** (works with MAMP 7.4; polyfills for PHP 8 string helpers). Optional for the skill: **yt-dlp** on PATH (Homebrew: `brew install yt-dlp`).
 
 ## Harness workflow (6 steps)
 
@@ -67,7 +67,7 @@ Web access to this script is blocked (CLI only).
 
 ## Design notes
 
-Plain PHP 8, Tailwind CDN, vanilla JS. Zero Composer deps by default. Neutral slate palette, Inter/system fonts, readable max width.
+Plain PHP 7.4+, Tailwind CDN, vanilla JS. Zero Composer deps by default. Neutral slate palette, Inter/system fonts, readable max width.
 
 ## License
 

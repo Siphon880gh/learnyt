@@ -11,7 +11,9 @@ $itemId = isset($_GET['item']) ? (string) $_GET['item'] : '';
 
 $queue = array_merge($buckets['overdue'], $buckets['dueToday']);
 if ($filterV !== '') {
-    $queue = array_values(array_filter($queue, static fn($i) => ($i['videoId'] ?? '') === $filterV));
+    $queue = array_values(array_filter($queue, static function ($i) use ($filterV) {
+        return ($i['videoId'] ?? '') === $filterV;
+    }));
 }
 
 $current = null;

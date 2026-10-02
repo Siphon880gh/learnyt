@@ -3,14 +3,23 @@ declare(strict_types=1);
 
 /**
  * Shared helpers: escaping, JSON I/O, time formatting, deep links, CSRF-lite.
+ * Typed for PHP 7.4+ (no union/mixed/never types).
  */
 
-function e(?string $s): string
+/**
+ * @param string|null $s
+ */
+function e($s): string
 {
     return htmlspecialchars($s ?? '', ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 }
 
-function json_read(string $path, mixed $default = null): mixed
+/**
+ * @param string $path
+ * @param mixed $default
+ * @return mixed
+ */
+function json_read($path, $default = null)
 {
     if (!is_readable($path)) {
         return $default;
@@ -23,7 +32,11 @@ function json_read(string $path, mixed $default = null): mixed
     return json_last_error() === JSON_ERROR_NONE ? $data : $default;
 }
 
-function json_write(string $path, mixed $data): bool
+/**
+ * @param string $path
+ * @param mixed $data
+ */
+function json_write($path, $data): bool
 {
     $dir = dirname($path);
     if (!is_dir($dir)) {
@@ -36,9 +49,12 @@ function json_write(string $path, mixed $data): bool
     return file_put_contents($path, $json . "\n", LOCK_EX) !== false;
 }
 
-function format_time(int|float $seconds): string
+/**
+ * @param int|float $seconds
+ */
+function format_time($seconds): string
 {
-    $s = (int) max(0, floor($seconds));
+    $s = (int) max(0, floor((float) $seconds));
     $h = intdiv($s, 3600);
     $m = intdiv($s % 3600, 60);
     $sec = $s % 60;
@@ -48,7 +64,10 @@ function format_time(int|float $seconds): string
     return sprintf('%d:%02d', $m, $sec);
 }
 
-function parse_time_param(?string $t): int
+/**
+ * @param string|null $t
+ */
+function parse_time_param($t): int
 {
     if ($t === null || $t === '') {
         return 0;
@@ -90,7 +109,9 @@ function lesson_deep_link(string $videoId, array $params = []): string
     $q = array_merge(['v' => $videoId], $params);
     // Strip empties and secrets-like keys
     unset($q['key'], $q['token'], $q['api_key'], $q['secret']);
-    $q = array_filter($q, static fn($v) => $v !== null && $v !== '');
+    $q = array_filter($q, static function ($v) {
+        return $v !== null && $v !== '';
+    });
     return 'lesson.php?' . http_build_query($q);
 }
 
@@ -104,7 +125,13 @@ function request_json(): array
     return is_array($data) ? $data : [];
 }
 
-function json_response(mixed $data, int $status = 200): never
+/**
+ * Emit JSON and exit. (PHP 8.1 `never` avoided for 7.4.)
+ *
+ * @param mixed $data
+ * @return void
+ */
+function json_response($data, int $status = 200)
 {
     http_response_code($status);
     header('Content-Type: application/json; charset=utf-8');
@@ -116,13 +143,13 @@ function json_response(mixed $data, int $status = 200): never
 function ensure_same_origin(): void
 {
     // Lightweight same-origin check for mutating APIs
-    $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+    $method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
     if (!in_array($method, ['POST', 'PUT', 'PATCH', 'DELETE'], true)) {
         return;
     }
-    $host = $_SERVER['HTTP_HOST'] ?? '';
-    $origin = $_SERVER['HTTP_ORIGIN'] ?? '';
-    $referer = $_SERVER['HTTP_REFERER'] ?? '';
+    $host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
+    $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+    $referer = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
     $ok = false;
     if ($origin !== '') {
         $oh = parse_url($origin, PHP_URL_HOST);
@@ -151,7 +178,10 @@ function uuid_v4(): string
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($d), 4));
 }
 
-function category_label(?string $cat): string
+/**
+ * @param string|null $cat
+ */
+function category_label($cat): string
 {
     $map = [
         'concept' => 'Core concepts',
@@ -165,5 +195,5 @@ function category_label(?string $cat): string
         'takeaway' => 'Takeaways',
         'other' => 'Other',
     ];
-    return $map[$cat ?? ''] ?? ($cat ? ucfirst($cat) : 'Topic');
+    return isset($map[$cat ?? '']) ? $map[$cat ?? ''] : ($cat ? ucfirst($cat) : 'Topic');
 }
