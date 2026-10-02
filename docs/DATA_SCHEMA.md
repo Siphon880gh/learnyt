@@ -64,7 +64,7 @@ type LearnItem = {
 
 ## Diagrams / infographics
 
-Optional array on the lesson file. Prefer **Mermaid** (`kind: "mermaid"`) so the skill can emit text-only visuals with no binary assets. The PHP UI renders Mermaid client-side via CDN, shows diagrams as **inline transcript breaks**, and lists them in a **Diagrams** gallery that deep-links back to the segment/time.
+Array on the lesson file. The youtube-lesson skill is expected to emit **Mermaid** visual breaks (`kind: "mermaid"`, with `segmentId` + `start`) whenever a concept can be illustrated—text-only, no binary assets. The PHP UI renders Mermaid client-side via CDN, shows diagrams as **inline transcript breaks**, and lists them in a **Diagrams** gallery that deep-links back to the segment/time.
 
 ```ts
 type Diagram = {
@@ -83,7 +83,7 @@ type Diagram = {
 
 Guidelines for the skill:
 
-- Add a diagram when a process, comparison, hierarchy, timeline, or mechanism is easier to see than to read
+- **Required for illustratable ideas:** add a Mermaid diagram (visual break) when a process, comparison, hierarchy, timeline, or mechanism is easier to see than to read; always set `segmentId` + `start`
 - Keep Mermaid diagrams small (roughly ≤ 20 nodes)
 - Always set `start` (and `segmentId` when possible) so the UI can jump to source
 - Do not embed secrets or private URLs in `imageUrl`

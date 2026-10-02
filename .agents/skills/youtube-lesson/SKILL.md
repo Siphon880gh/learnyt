@@ -109,7 +109,7 @@ From the timestamped transcript:
 3. If no chapters: create **~5-minute** chronological fallbacks with descriptive titles from the first sentence of each window.
 4. Label learning material:
    - prerequisites, definitions, core concepts, arguments, mechanisms, examples, applications, mistakes, takeaways
-5. Draft diagrams for processes, mechanisms, comparisons, and hierarchies (see Diagrams section)
+5. Plan **visual breaks**: for each concept that can be illustrated, note the transcript `segmentId` + `start` where a Mermaid diagram should interrupt the reading flow (see § Visual breaks / Diagrams)
 
 ### 4. Build dual TOCs
 
@@ -141,7 +141,49 @@ Also fill:
 - `meta.createdAt` / `meta.updatedAt` (ISO-8601 UTC)
 - `meta.generator`: `"youtube-lesson-skill"`
 
-### 5. Write JSON
+### 5. Visual breaks — emit Mermaid diagrams (required when concepts can be illustrated)
+
+**At visual breaks, generating Mermaid diagrams is useful and expected.** Whenever a process, mechanism, comparison, hierarchy, timeline, or causal chain appears in the lecture, add an entry to `diagrams[]` so the PHP UI inserts an **inline visual break** after the linked transcript segment (and lists it in the Diagrams gallery).
+
+For each such concept:
+
+1. Pick the transcript segment that finishes introducing the idea (`segmentId`, e.g. `"s5"`).
+2. Set `start` (and optional `end`) to that segment’s timestamp in seconds.
+3. Emit `kind: "mermaid"` with a compact Mermaid source string in `mermaid` (flowchart, sequenceDiagram, mindmap, or timeline-style flowchart).
+4. Give a short `title` + `caption`. Keep ≤ ~20 nodes; no secrets.
+
+Schema-matching example (inline break after segment `s5` at t=62):
+
+```json
+{
+  "id": "d1",
+  "title": "SM-2 rating flow",
+  "caption": "How Again / Hard / Good / Easy change the next interval.",
+  "segmentId": "s5",
+  "start": 62,
+  "end": 80,
+  "kind": "mermaid",
+  "mermaid": "flowchart TD\n  R[Review card] --> A{Rating}\n  A -->|Again| X[Reset / short delay]\n  A -->|Hard| H[Smaller growth]\n  A -->|Good| G[ease × interval]\n  A -->|Easy| E[Larger interval]\n  X --> N[Next review]\n  H --> N\n  G --> N\n  E --> N"
+}
+```
+
+Another useful pattern — sequence for ordered steps:
+
+```json
+{
+  "id": "d2",
+  "title": "Retrieval practice loop",
+  "caption": "Recall before re-reading.",
+  "segmentId": "s6",
+  "start": 80,
+  "kind": "mermaid",
+  "mermaid": "sequenceDiagram\n  participant L as Learner\n  participant M as Memory\n  L->>M: Attempt recall\n  M-->>L: Partial or full answer\n  L->>M: Restudy gaps\n  Note over L,M: Space the next review"
+}
+```
+
+Do **not** skip this step when the video clearly teaches something visualizable. Prefer Mermaid over SVG/image so the skill stays text-only. See also **Diagrams / infographics** below.
+
+### 6. Write JSON
 
 Path: `data/lessons/{videoId}.json`
 
@@ -190,22 +232,25 @@ Use pretty-printed UTF-8 JSON. Validate:
 - Segment ids unique; TOC ids unique
 - `video.id` matches filename stem
 
-### 6. Verify in the app
+### 7. Verify in the app
 
 ```bash
 php -S localhost:8080
 ```
 
-Open `http://localhost:8080/` — lesson should appear. Open `lesson.php?v=VIDEO_ID` and spot-check:
+Open `http://localhost:8080/` — lesson should appear (Import or file). Open `lesson.php?v=VIDEO_ID` and spot-check:
 
 - Chronological | Learning Structure toggle
 - Transcript timestamps seek the player
-- Deep link `?v=&t=&toc=`
+- Mermaid **visual breaks** appear inline after the linked segments; Diagrams gallery lists them
+- Deep link `?v=&t=&toc=&dg=`
 
 
 ## Diagrams / infographics
 
-After TOCs (or in the same pass), add a `diagrams` array for anything that is easier to **see** than to only read:
+**Required when learnable ideas can be illustrated:** populate `diagrams[]` with Mermaid visuals attached to transcript segments as **visual breaks**. This is not optional decoration—the Learnyt UI is built to interrupt the transcript with these diagrams and to list them in a gallery.
+
+Good candidates:
 
 - Processes / algorithms (e.g. SM-2 rating flow)
 - Comparisons / contrasts
@@ -213,7 +258,9 @@ After TOCs (or in the same pass), add a `diagrams` array for anything that is ea
 - Timelines / causal chains
 - Mechanisms / system diagrams
 
-**Prefer Mermaid** (`kind: "mermaid"`) so you emit text only—no binary assets, no image hosting.
+**Use Mermaid** (`kind: "mermaid"` + `mermaid` source string) by default—text only, no binary assets. The app renders Mermaid client-side (CDN).
+
+Minimal schema-matching object:
 
 ```json
 {
@@ -224,27 +271,28 @@ After TOCs (or in the same pass), add a `diagrams` array for anything that is ea
   "start": 62,
   "end": 80,
   "kind": "mermaid",
-  "mermaid": "flowchart TD\n  A[Start] --> B[Step]"
+  "mermaid": "flowchart TD\n  A[Start] --> B[Step]\n  B --> C[Result]"
 }
 ```
 
-Also supported:
+Also supported (secondary):
 
-- `kind: "svg"` + `svg`: "<svg ...>...</svg>" (no scripts / event handlers)
+- `kind: "svg"` + `svg`: `"<svg ...>...</svg>"` (no scripts / event handlers)
 - `kind: "image"` + `imageUrl`: `https://...` or local `assets/...` / `data/...` path
 
 Rules:
 
-1. Always set `start` (seconds) so the UI can jump to the video/transcript
-2. Set `segmentId` when the diagram belongs after a specific transcript segment (inline visual break)
-3. Keep Mermaid small (≤ ~20 nodes); use `flowchart`, `sequenceDiagram`, or `mindmap` as appropriate
-4. 1–6 diagrams per typical lecture is enough; skip decorative fluff
+1. Always set `start` (seconds) so Jump-to-video / deep links work
+2. **Always set `segmentId`** to the transcript segment the diagram should follow (that is what creates the inline visual break)
+3. Keep Mermaid small (≤ ~20 nodes); prefer `flowchart`, `sequenceDiagram`, or `mindmap`
+4. Typically 1–6 diagrams per lecture; skip purely decorative fluff, but do not skip clear visualizable concepts
 5. Never put secrets or private URLs in diagram payloads
+6. Diagram `id`s unique (`d1`, `d2`, …)
 
-The PHP UI:
+The PHP UI (`lesson.php` + Mermaid CDN):
 
-- Renders Mermaid client-side (CDN)
-- Inserts diagrams **inline in the transcript** after the linked segment
+- Renders `pre.mermaid` client-side
+- Inserts diagrams **inline in the transcript** immediately after the linked `segmentId`
 - Shows a **Diagrams** gallery; each card deep-links with `?dg=` + `?t=`
 
 ## Quality bar
@@ -252,6 +300,7 @@ The PHP UI:
 - Titles are specific (not “Part 1”, “Section 2”) unless the speaker uses those labels
 - Learning TOC covers definitions + mechanisms + examples + takeaways when present
 - Transcript is readable (punctuation cleaned; no raw VTT tags)
+- Visualizable concepts have Mermaid entries in `diagrams[]` with `segmentId` + `start` (inline visual breaks)
 - No secrets in the JSON
 
 ## Example user prompt
@@ -265,6 +314,6 @@ The PHP UI:
 - [ ] Fetched / parsed transcript (or documented failure)
 - [ ] Built chronological TOC
 - [ ] Built learning TOC with categories + source timestamps
-- [ ] Added diagrams/infographics for visually learnable ideas (Mermaid preferred)
+- [ ] Added Mermaid visual breaks (`diagrams[]` with `kind: "mermaid"`, `segmentId`, `start`) for illustratable concepts
 - [ ] Wrote `data/lessons/{id}.json`
 - [ ] Confirmed file opens in Learnyt UI (dual TOC + Diagrams gallery)

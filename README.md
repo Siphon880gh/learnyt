@@ -67,7 +67,7 @@ Toggle on the lesson page (`?toc=chrono|learn`).
 
 ## Diagrams / infographics
 
-Lessons may include a `diagrams` array (prefer **Mermaid** text so no binary assets are required; SVG and image URLs also work). In the UI:
+Lessons include a `diagrams` array. The **youtube-lesson skill should emit Mermaid** (`kind: "mermaid"`) visual breaks attached to transcript segments whenever a concept can be illustrated (SVG/image also work). In the UI:
 
 - Diagrams appear as **inline visual breaks** in the transcript at the linked segment/time
 - A **Diagrams** gallery lists all visuals; each jumps to the transcript + video timestamp
