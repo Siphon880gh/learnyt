@@ -100,6 +100,7 @@ From the timestamped transcript:
 3. If no chapters: create **~5-minute** chronological fallbacks with descriptive titles from the first sentence of each window.
 4. Label learning material:
    - prerequisites, definitions, core concepts, arguments, mechanisms, examples, applications, mistakes, takeaways
+5. Draft diagrams for processes, mechanisms, comparisons, and hierarchies (see Diagrams section)
 
 ### 4. Build dual TOCs
 
@@ -161,6 +162,15 @@ Minimum shape:
     "title": "…",
     "category": "concept",
     "sources": [{ "start": 0, "end": 60 }]
+  }],
+  "diagrams": [{
+    "id": "d1",
+    "title": "…",
+    "caption": "…",
+    "segmentId": "s1",
+    "start": 0,
+    "kind": "mermaid",
+    "mermaid": "flowchart LR\n  A --> B"
   }]
 }
 ```
@@ -183,6 +193,51 @@ Open `http://localhost:8080/` — lesson should appear. Open `lesson.php?v=VIDEO
 - Transcript timestamps seek the player
 - Deep link `?v=&t=&toc=`
 
+
+## Diagrams / infographics
+
+After TOCs (or in the same pass), add a `diagrams` array for anything that is easier to **see** than to only read:
+
+- Processes / algorithms (e.g. SM-2 rating flow)
+- Comparisons / contrasts
+- Hierarchies / taxonomies
+- Timelines / causal chains
+- Mechanisms / system diagrams
+
+**Prefer Mermaid** (`kind: "mermaid"`) so you emit text only—no binary assets, no image hosting.
+
+```json
+{
+  "id": "d1",
+  "title": "Short descriptive title",
+  "caption": "One sentence of context",
+  "segmentId": "s5",
+  "start": 62,
+  "end": 80,
+  "kind": "mermaid",
+  "mermaid": "flowchart TD\n  A[Start] --> B[Step]"
+}
+```
+
+Also supported:
+
+- `kind: "svg"` + `svg`: "<svg ...>...</svg>" (no scripts / event handlers)
+- `kind: "image"` + `imageUrl`: `https://...` or local `assets/...` / `data/...` path
+
+Rules:
+
+1. Always set `start` (seconds) so the UI can jump to the video/transcript
+2. Set `segmentId` when the diagram belongs after a specific transcript segment (inline visual break)
+3. Keep Mermaid small (≤ ~20 nodes); use `flowchart`, `sequenceDiagram`, or `mindmap` as appropriate
+4. 1–6 diagrams per typical lecture is enough; skip decorative fluff
+5. Never put secrets or private URLs in diagram payloads
+
+The PHP UI:
+
+- Renders Mermaid client-side (CDN)
+- Inserts diagrams **inline in the transcript** after the linked segment
+- Shows a **Diagrams** gallery; each card deep-links with `?dg=` + `?t=`
+
 ## Quality bar
 
 - Titles are specific (not “Part 1”, “Section 2”) unless the speaker uses those labels
@@ -201,5 +256,6 @@ Open `http://localhost:8080/` — lesson should appear. Open `lesson.php?v=VIDEO
 - [ ] Fetched / parsed transcript (or documented failure)
 - [ ] Built chronological TOC
 - [ ] Built learning TOC with categories + source timestamps
+- [ ] Added diagrams/infographics for visually learnable ideas (Mermaid preferred)
 - [ ] Wrote `data/lessons/{id}.json`
-- [ ] Confirmed file opens in Learnyt UI
+- [ ] Confirmed file opens in Learnyt UI (dual TOC + Diagrams gallery)

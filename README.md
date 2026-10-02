@@ -1,8 +1,15 @@
-# Learnyt
+# Learnyt (youtube-learner)
+
+![Last Commit](https://img.shields.io/github/last-commit/Siphon880gh/youtube-learner/main)
+<a target="_blank" href="https://github.com/Siphon880gh" rel="nofollow"><img src="https://img.shields.io/badge/GitHub--blue?style=social&logo=GitHub" alt="Github" data-canonical-src="https://img.shields.io/badge/GitHub--blue?style=social&logo=GitHub" style="max-width:8.5ch;"></a>
+<a target="_blank" href="https://www.linkedin.com/in/weng-fung/" rel="nofollow"><img src="https://img.shields.io/badge/LinkedIn-blue?style=flat&logo=linkedin&labelColor=blue" alt="Linked-In" data-canonical-src="https://img.shields.io/badge/LinkedIn-blue?style=flat&amp;logo=linkedin&amp;labelColor=blue" style="max-width:10ch;"></a>
+<a target="_blank" href="https://www.youtube.com/@WengTeachesCode/" rel="nofollow"><img src="https://img.shields.io/badge/Youtube-red?style=flat&logo=youtube&labelColor=red" alt="Youtube" data-canonical-src="https://img.shields.io/badge/Youtube-red?style=flat&amp;logo=youtube&amp;labelColor=red" style="max-width:10ch;"></a>
+
+By Weng (Weng Fei Fung). Generate transcripts, lessons, spaced repetition, infographics/diagrams for any Youtube video where learning is important.
 
 Harness-first **YouTube → interactive learning modules**.
 
-You do **not** submit URLs through a web form. Open this project in an AI coding harness (Cursor, Claude Code, etc.), paste a YouTube URL in chat, and the local skill under `.agents/skills/youtube-lesson/` fetches the transcript, builds dual TOCs, and writes lesson JSON. This PHP app renders lessons with highlights, deep links, and spaced repetition.
+You do **not** submit URLs through a web form. Open this project in an AI coding harness (Cursor, Claude Code, etc.), paste a YouTube URL in chat, and the local skill under `.agents/skills/youtube-lesson/` fetches the transcript, builds dual TOCs, diagrams/infographics, and writes lesson JSON. This PHP app renders lessons with highlights, deep links, visual breaks, and spaced repetition.
 
 ## Quick start
 
@@ -21,9 +28,9 @@ Requirements: **PHP 7.4+** (works with MAMP 7.4; polyfills for PHP 8 string help
 1. Open this folder in an AI coding harness with local tools.
 2. Paste a YouTube URL in chat; ask to run the **youtube-lesson** skill.
 3. Skill fetches timestamped transcript (yt-dlp / `php api/transcript_helper.php`).
-4. Skill segments content and builds chronological + learning TOCs.
+4. Skill segments content, builds chronological + learning TOCs, and adds Mermaid/SVG diagrams where visuals help.
 5. Skill writes `data/lessons/{videoId}.json`.
-6. Refresh Lessons → study, highlight, deep-link, save to SRS.
+6. Refresh Lessons → study, highlight, deep-link, browse diagrams, save to SRS.
 
 Skill instructions: [`.agents/skills/youtube-lesson/SKILL.md`](.agents/skills/youtube-lesson/SKILL.md)  
 Schema: [`docs/DATA_SCHEMA.md`](docs/DATA_SCHEMA.md)
@@ -33,7 +40,7 @@ Schema: [`docs/DATA_SCHEMA.md`](docs/DATA_SCHEMA.md)
 | Page | Role |
 |------|------|
 | `index.php` | Landing, workflow, lesson list |
-| `lesson.php?v=` | Dual TOC, video, transcript, highlights |
+| `lesson.php?v=` | Dual TOC, video, transcript, diagrams, highlights |
 | `review.php` | SRS queue (Again / Hard / Good / Easy) |
 | `api/*.php` | Highlights, SRS, lessons JSON APIs |
 
@@ -43,6 +50,14 @@ Schema: [`docs/DATA_SCHEMA.md`](docs/DATA_SCHEMA.md)
 - **Learning Structure** — study order (concepts, definitions, examples, …) linking back to source times  
 
 Toggle on the lesson page (`?toc=chrono|learn`).
+
+## Diagrams / infographics
+
+Lessons may include a `diagrams` array (prefer **Mermaid** text so no binary assets are required; SVG and image URLs also work). In the UI:
+
+- Diagrams appear as **inline visual breaks** in the transcript at the linked segment/time
+- A **Diagrams** gallery lists all visuals; each jumps to the transcript + video timestamp
+- Deep link: `lesson.php?v=VIDEO_ID&dg=d1&t=62`
 
 ## Highlights & SRS
 
@@ -67,7 +82,7 @@ Web access to this script is blocked (CLI only).
 
 ## Design notes
 
-Plain PHP 7.4+, Tailwind CDN, vanilla JS. Zero Composer deps by default. Neutral slate palette, Inter/system fonts, readable max width.
+Plain PHP 7.4+, Tailwind CDN, vanilla JS, Mermaid CDN for diagrams. Zero Composer deps by default. Neutral slate palette, Inter/system fonts, readable max width.
 
 ## License
 

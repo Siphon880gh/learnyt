@@ -33,32 +33,40 @@ layout_header('Home', ['nav' => 'home']);
 </div>
 
 <section id="workflow" class="mx-auto max-w-3xl px-4 sm:px-6 pb-16">
-  <h2 class="text-xl font-semibold text-slate-900 mb-6">Six-step harness workflow</h2>
-  <ol class="space-y-5">
-    <?php
-    $steps = [
-      ['Open the project', 'Open this folder in Cursor, Claude Code, or another AI coding harness with local tool access.'],
-      ['Paste a YouTube URL', 'In chat, give a video URL (or ID). Ask the agent to run the youtube-lesson skill.'],
-      ['Skill fetches transcript', 'The skill uses yt-dlp (or documented fallbacks) to get timestamped captions server-side / locally.'],
-      ['Analyze & structure', 'It segments the talk, detects chapters/subjects/examples, and builds chronological + learning TOCs.'],
-      ['Write lesson JSON', 'Output lands at data/lessons/{videoId}.json matching the app schema (see docs/DATA_SCHEMA.md).'],
-      ['Study here', 'Refresh Lessons, open the module, highlight, deep-link, and save items to spaced repetition.'],
-    ];
-    foreach ($steps as $i => $step):
-    ?>
-    <li class="flex gap-4">
-      <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-900 text-sm font-medium text-white"><?= $i + 1 ?></span>
-      <div>
-        <p class="font-medium text-slate-900"><?= e($step[0]) ?></p>
-        <p class="text-slate-600 mt-1 leading-relaxed"><?= e($step[1]) ?></p>
-      </div>
-    </li>
-    <?php endforeach; ?>
-  </ol>
-  <p class="mt-8 text-sm text-slate-500">
-    Skill path: <code class="rounded bg-slate-100 px-1.5 py-0.5 text-slate-800">.agents/skills/youtube-lesson/SKILL.md</code>
-    · Run app: <code class="rounded bg-slate-100 px-1.5 py-0.5 text-slate-800">php -S localhost:8080</code>
-  </p>
+  <details class="group rounded-xl border border-slate-200 bg-white open:shadow-sm">
+    <summary class="cursor-pointer list-none flex items-center justify-between gap-3 px-5 py-4 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 rounded-xl">
+      <span class="text-xl font-semibold text-slate-900">Six-step harness workflow</span>
+      <span class="text-sm text-slate-500 group-open:hidden">Show</span>
+      <span class="text-sm text-slate-500 hidden group-open:inline">Hide</span>
+    </summary>
+    <div class="px-5 pb-6 border-t border-slate-100 pt-5">
+      <ol class="space-y-5">
+        <?php
+        $steps = [
+          ['Open the project', 'Open this folder in Cursor, Claude Code, or another AI coding harness with local tool access.'],
+          ['Paste a YouTube URL', 'In chat, give a video URL (or ID). Ask the agent to run the youtube-lesson skill.'],
+          ['Skill fetches transcript', 'The skill uses yt-dlp (or documented fallbacks) to get timestamped captions server-side / locally.'],
+          ['Analyze & structure', 'It segments the talk, detects chapters/subjects/examples, builds dual TOCs, and drafts diagrams/infographics where visuals help learning.'],
+          ['Write lesson JSON', 'Output lands at data/lessons/{videoId}.json matching the app schema (see docs/DATA_SCHEMA.md).'],
+          ['Study here', 'Refresh Lessons, open the module, highlight, browse diagrams, deep-link, and save items to spaced repetition.'],
+        ];
+        foreach ($steps as $i => $step):
+        ?>
+        <li class="flex gap-4">
+          <span class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-900 text-sm font-medium text-white"><?= $i + 1 ?></span>
+          <div>
+            <p class="font-medium text-slate-900"><?= e($step[0]) ?></p>
+            <p class="text-slate-600 mt-1 leading-relaxed"><?= e($step[1]) ?></p>
+          </div>
+        </li>
+        <?php endforeach; ?>
+      </ol>
+      <p class="mt-8 text-sm text-slate-500">
+        Skill path: <code class="rounded bg-slate-100 px-1.5 py-0.5 text-slate-800">.agents/skills/youtube-lesson/SKILL.md</code>
+        · Run app: <code class="rounded bg-slate-100 px-1.5 py-0.5 text-slate-800">php -S localhost:8080</code>
+      </p>
+    </div>
+  </details>
 </section>
 
 <section class="mx-auto max-w-3xl px-4 sm:px-6 pb-20">
@@ -98,6 +106,9 @@ layout_header('Home', ['nav' => 'home']);
               <?= (int) $lesson['segmentCount'] ?> segments ·
               <?= (int) $lesson['chronoCount'] ?> chrono ·
               <?= (int) $lesson['learnCount'] ?> learn topics
+              <?php if (!empty($lesson['diagramCount'])): ?>
+              · <?= (int) $lesson['diagramCount'] ?> diagrams
+              <?php endif; ?>
             </p>
           </div>
         </div>

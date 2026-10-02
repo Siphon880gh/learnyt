@@ -197,3 +197,93 @@ function category_label($cat): string
     ];
     return isset($map[$cat ?? '']) ? $map[$cat ?? ''] : ($cat ? ucfirst($cat) : 'Topic');
 }
+
+/**
+ * Render a lesson diagram card (gallery or inline transcript break).
+ * PHP 7.4 compatible. Mermaid/SVG/image only — no secrets.
+ *
+ * @param array $diagram
+ * @param string $videoId
+ * @param array $opts  context: 'inline'|'gallery'
+ */
+function render_diagram_card(array $diagram, $videoId, array $opts = [])
+{
+    $context = isset($opts['context']) ? $opts['context'] : 'gallery';
+    $id = (string) (isset($diagram['id']) ? $diagram['id'] : '');
+    $title = (string) (isset($diagram['title']) ? $diagram['title'] : 'Diagram');
+    $caption = isset($diagram['caption']) ? (string) $diagram['caption'] : '';
+    $kind = (string) (isset($diagram['kind']) ? $diagram['kind'] : 'mermaid');
+    $start = isset($diagram['start']) ? (float) $diagram['start'] : 0;
+    $segmentId = isset($diagram['segmentId']) ? (string) $diagram['segmentId'] : '';
+    $deep = lesson_deep_link($videoId, array(
+        't' => (int) $start,
+        'seg' => $segmentId,
+        'dg' => $id,
+    ));
+    $wrapClass = $context === 'inline'
+        ? 'diagram-card diagram-inline my-4 rounded-xl border border-indigo-200 bg-indigo-50/40 p-4 sm:p-5'
+        : 'diagram-card rounded-xl border border-slate-200 bg-white p-4 sm:p-5';
+    ?>
+    <figure id="dg-<?= e($id) ?>" class="<?= e($wrapClass) ?>" data-diagram-id="<?= e($id) ?>" data-start="<?= e((string) $start) ?>" data-seg-id="<?= e($segmentId) ?>">
+      <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
+        <div class="min-w-0">
+          <?php if ($context === 'inline'): ?>
+          <p class="text-xs font-semibold uppercase tracking-wide text-indigo-600 mb-1">Visual break</p>
+          <?php endif; ?>
+          <figcaption class="font-medium text-slate-900"><?= e($title) ?></figcaption>
+          <?php if ($caption !== ''): ?>
+          <p class="mt-1 text-sm text-slate-600"><?= e($caption) ?></p>
+          <?php endif; ?>
+        </div>
+        <a href="<?= e($deep) ?>"
+           class="shrink-0 text-xs font-medium text-slate-600 underline hover:text-slate-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 rounded"
+           data-seek="<?= e((string) $start) ?>"
+           data-diagram-jump="<?= e($id) ?>">
+          Jump to <?= e(format_time((int) $start)) ?>
+        </a>
+      </div>
+      <div class="diagram-body overflow-x-auto rounded-lg bg-white border border-slate-100 p-3">
+        <?php if ($kind === 'mermaid' && !empty($diagram['mermaid'])): ?>
+        <pre class="mermaid text-sm leading-normal"><?= e((string) $diagram['mermaid']) ?></pre>
+        <?php elseif ($kind === 'svg' && !empty($diagram['svg'])): ?>
+        <div class="diagram-svg max-w-full text-slate-800"><?= sanitize_inline_svg((string) $diagram['svg']) ?></div>
+        <?php elseif ($kind === 'image' && !empty($diagram['imageUrl'])): ?>
+        <?php
+          $src = (string) $diagram['imageUrl'];
+          // Allow https URLs or local relative paths under assets/ or data/ only
+          $ok = (strpos($src, 'https://') === 0)
+            || (strpos($src, 'assets/') === 0)
+            || (strpos($src, 'data/') === 0);
+        ?>
+        <?php if ($ok): ?>
+        <img src="<?= e($src) ?>" alt="<?= e($title) ?>" class="max-w-full h-auto mx-auto" loading="lazy">
+        <?php else: ?>
+        <p class="text-sm text-slate-500">Image blocked (use https:// or local assets/ / data/ path).</p>
+        <?php endif; ?>
+        <?php else: ?>
+        <p class="text-sm text-slate-500">No diagram payload for kind “<?= e($kind) ?>”.</p>
+        <?php endif; ?>
+      </div>
+    </figure>
+    <?php
+}
+
+/**
+ * Allow a minimal inline SVG subset (no scripts/handlers).
+ *
+ * @param string $svg
+ * @return string
+ */
+function sanitize_inline_svg($svg)
+{
+    $svg = (string) $svg;
+    // Strip script tags and on* attributes
+    $svg = preg_replace('/<script\b[^>]*>.*?<\/script>/is', '', $svg);
+    $svg = preg_replace('/\son[a-z]+\s*=\s*("[^"]*"|\'[^\']*\'|[^\s>]+)/i', '', $svg);
+    $svg = preg_replace('/javascript:/i', '', $svg);
+    // Only keep if it looks like SVG
+    if (stripos($svg, '<svg') === false) {
+        return '<p class="text-sm text-slate-500">Invalid SVG.</p>';
+    }
+    return $svg;
+}

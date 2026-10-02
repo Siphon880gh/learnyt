@@ -25,6 +25,7 @@ final class LessonRepository
                 'segmentCount' => count($data['transcript'] ?? []),
                 'chronoCount' => count($data['chronologicalToc'] ?? []),
                 'learnCount' => count($data['learningToc'] ?? []),
+                'diagramCount' => count($data['diagrams'] ?? []),
                 'updatedAt' => $data['meta']['updatedAt'] ?? null,
                 'file' => basename($file),
             ];

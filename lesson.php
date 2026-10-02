@@ -23,11 +23,13 @@ $video = $lesson['video'] ?? [];
 $transcript = $lesson['transcript'] ?? [];
 $chrono = $lesson['chronologicalToc'] ?? [];
 $learn = $lesson['learningToc'] ?? [];
+$diagrams = isset($lesson['diagrams']) && is_array($lesson['diagrams']) ? $lesson['diagrams'] : [];
 $title = (string) ($video['title'] ?? $videoId);
 
 $startT = parse_time_param(isset($_GET['t']) ? (string) $_GET['t'] : null);
 $segParam = isset($_GET['seg']) ? (string) $_GET['seg'] : '';
 $hlParam = isset($_GET['hl']) ? (string) $_GET['hl'] : '';
+$dgParam = isset($_GET['dg']) ? (string) $_GET['dg'] : '';
 $tocMode = (isset($_GET['toc']) && $_GET['toc'] === 'learn') ? 'learn' : 'chrono';
 $navSection = isset($_GET['section']) ? (string) $_GET['section'] : 'overview';
 
@@ -67,6 +69,7 @@ layout_header($title, ['nav' => 'home']);
         'chrono' => 'Chronological TOC',
         'learn' => 'Learning TOC',
         'transcript' => 'Transcript',
+        'diagrams' => 'Diagrams',
         'highlights' => 'Highlights',
         'review' => 'Review',
       ];
@@ -86,6 +89,7 @@ layout_header($title, ['nav' => 'home']);
      data-start="<?= (int) $embedStart ?>"
      data-seg="<?= e($segParam) ?>"
      data-hl="<?= e($hlParam) ?>"
+     data-dg="<?= e($dgParam) ?>"
      data-toc="<?= e($tocMode) ?>">
 
   <!-- Video + TOC column -->
@@ -213,6 +217,22 @@ layout_header($title, ['nav' => 'home']);
         <button type="button" data-action="jump" class="rounded px-2 py-1.5 text-slate-700 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900">Jump to video</button>
       </div>
 
+      <?php
+        // Index diagrams by segmentId for inline transcript breaks
+        $diagramsBySeg = [];
+        $diagramsNoSeg = [];
+        foreach ($diagrams as $dg) {
+            $sid = isset($dg['segmentId']) ? (string) $dg['segmentId'] : '';
+            if ($sid !== '') {
+                if (!isset($diagramsBySeg[$sid])) {
+                    $diagramsBySeg[$sid] = [];
+                }
+                $diagramsBySeg[$sid][] = $dg;
+            } else {
+                $diagramsNoSeg[] = $dg;
+            }
+        }
+      ?>
       <div class="rounded-xl border border-slate-200 bg-white divide-y divide-slate-100" id="transcript-list">
         <?php foreach ($transcript as $seg):
           $sid = (string) ($seg['id'] ?? '');
@@ -229,11 +249,38 @@ layout_header($title, ['nav' => 'home']);
           </button>
           <p class="seg-text mt-1 text-slate-800 leading-relaxed select-text"><?= e((string) ($seg['text'] ?? '')) ?></p>
         </div>
+        <?php
+          if (!empty($diagramsBySeg[$sid])) {
+              foreach ($diagramsBySeg[$sid] as $dg) {
+                  echo '<div class="px-3 sm:px-4 py-2 bg-slate-50/80">';
+                  render_diagram_card($dg, $videoId, ['context' => 'inline']);
+                  echo '</div>';
+              }
+          }
+        ?>
         <?php endforeach; ?>
         <?php if (count($transcript) === 0): ?>
         <p class="p-6 text-slate-500">No transcript segments in this lesson file.</p>
         <?php endif; ?>
       </div>
+    </section>
+
+    <section id="diagrams" class="scroll-mt-24">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-lg font-semibold text-slate-900">Diagrams &amp; infographics</h2>
+        <span class="text-xs text-slate-400"><?= count($diagrams) ?></span>
+      </div>
+      <?php if (count($diagrams) === 0): ?>
+      <p class="text-sm text-slate-500 rounded-xl border border-dashed border-slate-300 bg-white p-6">
+        No diagrams in this lesson. The youtube-lesson skill can add Mermaid/SVG visuals for processes, comparisons, and mechanisms.
+      </p>
+      <?php else: ?>
+      <div class="space-y-4" id="diagram-gallery">
+        <?php foreach ($diagrams as $dg): ?>
+          <?php render_diagram_card($dg, $videoId, ['context' => 'gallery']); ?>
+        <?php endforeach; ?>
+      </div>
+      <?php endif; ?>
     </section>
 
     <section id="highlights">
@@ -273,10 +320,13 @@ layout_header($title, ['nav' => 'home']);
     start: <?= (int) $embedStart ?>,
     seg: <?= json_encode($segParam) ?>,
     hl: <?= json_encode($hlParam) ?>,
+    dg: <?= json_encode($dgParam) ?>,
     toc: <?= json_encode($tocMode) ?>
   };
 </script>
 <!-- YouTube IFrame API -->
 <script src="https://www.youtube.com/iframe_api"></script>
+<!-- Mermaid for lesson diagrams (client-side only; no secrets) -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
 <?php
 layout_footer();

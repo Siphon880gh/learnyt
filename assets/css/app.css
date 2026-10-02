@@ -52,3 +52,33 @@
 .srs-answer[hidden] {
   display: none !important;
 }
+
+/* Diagrams */
+.diagram-card {
+  scroll-margin-top: 6rem;
+}
+
+.diagram-inline {
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+}
+
+.diagram-body .mermaid,
+.diagram-body svg {
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.diagram-svg svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* Native details summary marker hide for cleaner UI */
+#workflow details > summary::-webkit-details-marker {
+  display: none;
+}
+#workflow details > summary {
+  list-style: none;
+}

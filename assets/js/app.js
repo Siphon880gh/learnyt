@@ -37,6 +37,7 @@
       t: extra.t != null ? String(Math.floor(extra.t)) : undefined,
       seg: extra.seg,
       hl: extra.hl,
+      dg: extra.dg,
       toc: extra.toc || cfg.toc || 'chrono',
     };
     Object.entries(params).forEach(([k, v]) => {
@@ -355,6 +356,7 @@
           chrono: 'chrono',
           learn: 'learn',
           transcript: 'transcript',
+          diagrams: 'diagrams',
           highlights: 'highlights',
         };
         if (section === 'learn') {
@@ -422,6 +424,57 @@
     });
   }
 
+
+  function initMermaid() {
+    if (typeof mermaid === 'undefined') return;
+    try {
+      mermaid.initialize({
+        startOnLoad: false,
+        theme: 'neutral',
+        securityLevel: 'strict',
+        flowchart: { htmlLabels: false },
+      });
+      const nodes = document.querySelectorAll('pre.mermaid');
+      if (nodes.length) {
+        mermaid.run({ nodes: nodes });
+      }
+    } catch (err) {
+      console.warn('Mermaid init failed', err);
+    }
+  }
+
+  function initDiagrams() {
+    const cfg = window.LEARNYT || {};
+    document.querySelectorAll('[data-diagram-jump]').forEach((a) => {
+      a.addEventListener('click', (e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+        e.preventDefault();
+        const t = Number(a.getAttribute('data-seek') || 0);
+        const id = a.getAttribute('data-diagram-jump');
+        seekTo(t);
+        highlightSegAt(t);
+        const el = id ? document.getElementById('dg-' + id) : null;
+        // Prefer scrolling to the matching transcript segment when present
+        const segId = el && el.getAttribute('data-seg-id');
+        const seg = segId ? document.getElementById('seg-' + segId) : null;
+        (seg || el)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el?.classList.add('ring-2', 'ring-indigo-400');
+      });
+    });
+
+    if (cfg.dg) {
+      const el = document.getElementById('dg-' + cfg.dg);
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.add('ring-2', 'ring-indigo-400');
+          const t = Number(el.getAttribute('data-start') || cfg.start || 0);
+          if (t > 0) highlightSegAt(t);
+        }, 400);
+      }
+    }
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     initToc();
     initSelectionToolbar();
@@ -430,6 +483,8 @@
     initLessonNav();
     initLearnSrs();
     initReview();
+    initMermaid();
+    initDiagrams();
     // If YT API already loaded
     if (typeof YT !== 'undefined' && YT.Player && !ytPlayer) {
       window.onYouTubeIframeAPIReady();

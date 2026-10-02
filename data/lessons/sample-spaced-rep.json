@@ -352,5 +352,37 @@
         }
       ]
     }
+  ],
+  "diagrams": [
+    {
+      "id": "d1",
+      "title": "Memory systems at a glance",
+      "caption": "Spaced repetition mainly consolidates traces into long-term memory via repeated retrieval.",
+      "segmentId": "s2",
+      "start": 12,
+      "end": 28,
+      "kind": "mermaid",
+      "mermaid": "flowchart LR\n  S[Sensory memory] --> W[Working memory]\n  W -->|encoding + retrieval practice| L[Long-term memory]\n  L -->|recall| W"
+    },
+    {
+      "id": "d2",
+      "title": "SM-2 rating → next interval",
+      "caption": "Honest ratings keep the queue healthy: Again resets; Hard/Good/Easy grow the interval.",
+      "segmentId": "s5",
+      "start": 62,
+      "end": 80,
+      "kind": "mermaid",
+      "mermaid": "flowchart TD\n  R[Review card] --> A{Rating}\n  A -->|Again| X[Short delay / reset]\n  A -->|Hard| H[Smaller interval growth]\n  A -->|Good| G[Standard ease × interval]\n  A -->|Easy| E[Larger interval + ease bump]\n  X --> N[Next review]\n  H --> N\n  G --> N\n  E --> N"
+    },
+    {
+      "id": "d3",
+      "title": "Forgetting curve vs spaced reviews",
+      "caption": "Each successful recall flattens the curve. SVG sketch for the sample lesson.",
+      "segmentId": "s3",
+      "start": 28,
+      "end": 45,
+      "kind": "svg",
+      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 420 180\" role=\"img\" aria-label=\"Forgetting curve with spaced reviews\"><rect width=\"420\" height=\"180\" fill=\"#fff\"/><text x=\"12\" y=\"20\" font-family=\"system-ui,sans-serif\" font-size=\"12\" fill=\"#64748b\">Recall strength</text><path d=\"M40 30 C 100 40, 140 110, 200 140 C 260 160, 320 168, 390 170\" fill=\"none\" stroke=\"#94a3b8\" stroke-width=\"2\" stroke-dasharray=\"4 4\"/><path d=\"M40 30 C 90 38, 110 70, 130 90\" fill=\"none\" stroke=\"#4f46e5\" stroke-width=\"2.5\"/><path d=\"M130 50 C 170 58, 190 95, 220 115\" fill=\"none\" stroke=\"#4f46e5\" stroke-width=\"2.5\"/><path d=\"M220 55 C 270 65, 300 100, 340 120\" fill=\"none\" stroke=\"#4f46e5\" stroke-width=\"2.5\"/><circle cx=\"130\" cy=\"90\" r=\"4\" fill=\"#4f46e5\"/><circle cx=\"220\" cy=\"115\" r=\"4\" fill=\"#4f46e5\"/><circle cx=\"340\" cy=\"120\" r=\"4\" fill=\"#4f46e5\"/><text x=\"118\" y=\"108\" font-family=\"system-ui,sans-serif\" font-size=\"10\" fill=\"#334155\">R1</text><text x=\"208\" y=\"133\" font-family=\"system-ui,sans-serif\" font-size=\"10\" fill=\"#334155\">R2</text><text x=\"328\" y=\"138\" font-family=\"system-ui,sans-serif\" font-size=\"10\" fill=\"#334155\">R3</text><text x=\"300\" y=\"28\" font-family=\"system-ui,sans-serif\" font-size=\"11\" fill=\"#64748b\">dashed = no review</text><line x1=\"40\" y1=\"170\" x2=\"390\" y2=\"170\" stroke=\"#cbd5e1\"/><line x1=\"40\" y1=\"30\" x2=\"40\" y2=\"170\" stroke=\"#cbd5e1\"/><text x=\"180\" y=\"178\" font-family=\"system-ui,sans-serif\" font-size=\"11\" fill=\"#64748b\">Time →</text></svg>"
+    }
   ]
 }

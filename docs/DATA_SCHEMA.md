@@ -31,6 +31,7 @@ type Lesson = {
   transcript: TranscriptSegment[]
   chronologicalToc: ChronoItem[]
   learningToc: LearnItem[]
+  diagrams?: Diagram[]
 }
 
 type TranscriptSegment = {
@@ -47,6 +48,7 @@ type ChronoItem = {
   end?: number
 }
 
+
 type LearnItem = {
   id: string
   title: string
@@ -55,6 +57,33 @@ type LearnItem = {
   sources: { start: number; end?: number }[]
 }
 ```
+
+## Diagrams / infographics
+
+Optional array on the lesson file. Prefer **Mermaid** (`kind: "mermaid"`) so the skill can emit text-only visuals with no binary assets. The PHP UI renders Mermaid client-side via CDN, shows diagrams as **inline transcript breaks**, and lists them in a **Diagrams** gallery that deep-links back to the segment/time.
+
+```ts
+type Diagram = {
+  id: string                   // e.g. "d1"
+  title: string
+  caption?: string
+  segmentId?: string           // transcript segment id to interrupt after
+  start?: number               // seconds — video/transcript jump target
+  end?: number
+  kind: 'mermaid' | 'svg' | 'image'
+  mermaid?: string             // when kind === 'mermaid'
+  svg?: string                 // when kind === 'svg' (inline SVG markup)
+  imageUrl?: string            // when kind === 'image' (https or local relative path)
+}
+```
+
+Guidelines for the skill:
+
+- Add a diagram when a process, comparison, hierarchy, timeline, or mechanism is easier to see than to read
+- Keep Mermaid diagrams small (roughly ≤ 20 nodes)
+- Always set `start` (and `segmentId` when possible) so the UI can jump to source
+- Do not embed secrets or private URLs in `imageUrl`
+
 
 ## Highlights
 
@@ -127,8 +156,9 @@ Human-readable query params on `lesson.php` (no secrets):
 | `seg` | transcript or TOC segment id |
 | `hl` | highlight id |
 | `toc` | `chrono` \| `learn` |
+| `dg` | diagram id |
 
-Example: `lesson.php?v=sample-spaced-rep&t=62&toc=learn&seg=l4`
+Example: `lesson.php?v=sample-spaced-rep&t=62&toc=learn&seg=l4&dg=d1`
 
 ## Lessons list API
 
