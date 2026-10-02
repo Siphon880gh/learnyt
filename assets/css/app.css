@@ -1,0 +1,54 @@
+/* Learnyt — small extras beyond Tailwind CDN */
+
+:root {
+  color-scheme: light;
+}
+
+.prose-lesson {
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.transcript-seg {
+  scroll-margin-top: 6rem;
+  border-left: 2px solid transparent;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.transcript-seg:hover,
+.transcript-seg.is-active {
+  background-color: rgb(241 245 249);
+  border-left-color: rgb(15 23 42);
+}
+
+.transcript-seg.is-highlighted {
+  background-color: rgb(254 249 195);
+}
+
+/* Selection toolbar */
+#selection-toolbar {
+  position: absolute;
+  z-index: 50;
+  transform: translate(-50%, -120%);
+  display: none;
+}
+
+#selection-toolbar.is-visible {
+  display: flex;
+}
+
+/* Focus rings for TOC links */
+.toc-link:focus-visible {
+  outline: 2px solid rgb(15 23 42);
+  outline-offset: 2px;
+}
+
+/* YouTube embed aspect */
+.video-frame {
+  aspect-ratio: 16 / 9;
+}
+
+/* Reveal card for SRS */
+.srs-answer[hidden] {
+  display: none !important;
+}

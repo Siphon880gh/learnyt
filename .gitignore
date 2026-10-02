@@ -1,0 +1,11 @@
+.env
+vendor/
+.DS_Store
+*.log
+data/srs.json
+data/highlights/*.json
+!data/highlights/.gitkeep
+!data/.gitkeep
+# Keep sample lessons tracked; ignore generated ones if desired:
+# data/lessons/*.json
+# !data/lessons/sample-*.json

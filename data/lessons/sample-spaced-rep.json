@@ -1,0 +1,356 @@
+{
+  "video": {
+    "id": "sample-spaced-rep",
+    "title": "Spaced Repetition Explained: Remember More with Less Cramming",
+    "channel": "Learnyt Sample Lectures",
+    "duration": 290,
+    "thumbnail": "https://img.youtube.com/vi/aircAruvnKk/hqdefault.jpg",
+    "url": "https://www.youtube.com/watch?v=aircAruvnKk",
+    "note": "Sample lesson: transcript/TOCs are synthetic educational content about spaced repetition. embedId points at a public YouTube video so the iframe demo works; it is not a transcript of that video.",
+    "embedId": "aircAruvnKk"
+  },
+  "meta": {
+    "createdAt": "2026-10-02T00:00:00Z",
+    "updatedAt": "2026-10-02T21:37:09Z",
+    "generator": "sample",
+    "summary": "A concise introduction to spaced repetition: forgetting curves, SM-2 style scheduling, retrieval practice, common mistakes, and how to start with atomic cards.",
+    "learningObjectives": [
+      "Explain the forgetting curve and why spacing helps",
+      "Describe how SM-2 adjusts interval and ease from ratings",
+      "Identify card design mistakes that break SRS",
+      "Apply spaced review to a domain beyond language learning"
+    ]
+  },
+  "transcript": [
+    {
+      "id": "s1",
+      "start": 0.0,
+      "end": 12.0,
+      "text": "Welcome. Today we are going to unpack spaced repetition—the idea that reviewing material at expanding intervals makes memories stick far better than cramming."
+    },
+    {
+      "id": "s2",
+      "start": 12.0,
+      "end": 28.0,
+      "text": "First, a quick prerequisite: memory is not a single store. Psychologists distinguish sensory memory, working memory, and long-term memory. Spaced repetition mainly trains the path into long-term memory."
+    },
+    {
+      "id": "s3",
+      "start": 28.0,
+      "end": 45.0,
+      "text": "The forgetting curve, popularized by Ebbinghaus in the late nineteenth century, shows that recall drops quickly after learning unless we reinforce it. The good news: each successful recall flattens that curve."
+    },
+    {
+      "id": "s4",
+      "start": 45.0,
+      "end": 62.0,
+      "text": "Definition: spaced repetition is a scheduling technique that presents an item for review just as you are about to forget it—often using an algorithm such as SM-2."
+    },
+    {
+      "id": "s5",
+      "start": 62.0,
+      "end": 80.0,
+      "text": "SM-2, originally from SuperMemo, tracks an ease factor and an interval. After you rate a card Again, Hard, Good, or Easy, the algorithm adjusts when you will see it next."
+    },
+    {
+      "id": "s6",
+      "start": 80.0,
+      "end": 98.0,
+      "text": "Core mechanism: retrieval practice. The act of recalling, not re-reading, strengthens the memory trace. Spacing adds difficulty in a productive way—desirable difficulty."
+    },
+    {
+      "id": "s7",
+      "start": 98.0,
+      "end": 115.0,
+      "text": "Example: imagine learning the Spanish word for apple. Day zero you learn it. Day one you recall it. Three days later you recall again. Then a week, then a month. Failures reset or shorten the interval."
+    },
+    {
+      "id": "s8",
+      "start": 115.0,
+      "end": 135.0,
+      "text": "A common mistake is making cards too broad. If a card asks for an entire essay, grading becomes noisy and the schedule cannot target the weak part. Prefer atomic facts or clear prompts."
+    },
+    {
+      "id": "s9",
+      "start": 135.0,
+      "end": 155.0,
+      "text": "Another mistake: passive highlighting without retrieval. Highlighting feels productive but does little unless you later force yourself to recall from cues."
+    },
+    {
+      "id": "s10",
+      "start": 155.0,
+      "end": 175.0,
+      "text": "Applications go beyond language decks. Engineers use spaced review for APIs and incident playbooks. Medical students use it for anatomy. Musicians space practice of difficult passages."
+    },
+    {
+      "id": "s11",
+      "start": 175.0,
+      "end": 195.0,
+      "text": "Argument: massed practice can produce short-term performance gains that fool you into thinking you have mastered the material. Spaced practice often looks worse in the moment but wins on delayed tests."
+    },
+    {
+      "id": "s12",
+      "start": 195.0,
+      "end": 215.0,
+      "text": "How to start: pick a tool—Anki, a simple JSON store like Learnyt, or paper flashcards. Capture one clear question and answer per card. Review daily, even for ten minutes."
+    },
+    {
+      "id": "s13",
+      "start": 215.0,
+      "end": 235.0,
+      "text": "When rating, be honest. If you barely recalled with hints, choose Hard or Again. Inflating Good ratings produces a pile of overdue cards later."
+    },
+    {
+      "id": "s14",
+      "start": 235.0,
+      "end": 255.0,
+      "text": "Takeaway one: memory is a skill of scheduling as much as of studying. Takeaway two: retrieval plus spacing beats rereading. Takeaway three: keep cards small and source-linked so you can jump back to context."
+    },
+    {
+      "id": "s15",
+      "start": 255.0,
+      "end": 275.0,
+      "text": "If you remember only one phrase from this talk, let it be desirable difficulty: the slight struggle of recalling at the right time is the feature, not the bug."
+    },
+    {
+      "id": "s16",
+      "start": 275.0,
+      "end": 290.0,
+      "text": "Thanks for watching. Try saving a few highlights from a real lecture into spaced repetition and rate them honestly for a week—you will feel the difference."
+    }
+  ],
+  "chronologicalToc": [
+    {
+      "id": "c1",
+      "title": "Welcome & agenda",
+      "start": 0,
+      "end": 12
+    },
+    {
+      "id": "c2",
+      "title": "Memory systems primer",
+      "start": 12,
+      "end": 28
+    },
+    {
+      "id": "c3",
+      "title": "The forgetting curve",
+      "start": 28,
+      "end": 45
+    },
+    {
+      "id": "c4",
+      "title": "Defining spaced repetition",
+      "start": 45,
+      "end": 62
+    },
+    {
+      "id": "c5",
+      "title": "SM-2 algorithm sketch",
+      "start": 62,
+      "end": 80
+    },
+    {
+      "id": "c6",
+      "title": "Retrieval practice & desirable difficulty",
+      "start": 80,
+      "end": 98
+    },
+    {
+      "id": "c7",
+      "title": "Worked example: vocabulary",
+      "start": 98,
+      "end": 115
+    },
+    {
+      "id": "c8",
+      "title": "Common mistakes",
+      "start": 115,
+      "end": 155
+    },
+    {
+      "id": "c9",
+      "title": "Applications beyond language",
+      "start": 155,
+      "end": 175
+    },
+    {
+      "id": "c10",
+      "title": "Massed vs spaced argument",
+      "start": 175,
+      "end": 195
+    },
+    {
+      "id": "c11",
+      "title": "Getting started & honest ratings",
+      "start": 195,
+      "end": 235
+    },
+    {
+      "id": "c12",
+      "title": "Takeaways & close",
+      "start": 235,
+      "end": 290
+    }
+  ],
+  "learningToc": [
+    {
+      "id": "l1",
+      "title": "Sensory, working, and long-term memory",
+      "category": "prerequisite",
+      "sources": [
+        {
+          "start": 12,
+          "end": 28
+        }
+      ]
+    },
+    {
+      "id": "l2",
+      "title": "Ebbinghaus forgetting curve",
+      "category": "concept",
+      "sources": [
+        {
+          "start": 28,
+          "end": 45
+        }
+      ]
+    },
+    {
+      "id": "l3",
+      "title": "Spaced repetition defined",
+      "category": "definition",
+      "sources": [
+        {
+          "start": 45,
+          "end": 62
+        }
+      ]
+    },
+    {
+      "id": "l4",
+      "title": "SM-2 ease factor and intervals",
+      "category": "mechanism",
+      "sources": [
+        {
+          "start": 62,
+          "end": 80
+        }
+      ]
+    },
+    {
+      "id": "l5",
+      "title": "Retrieval practice strengthens memory",
+      "category": "mechanism",
+      "sources": [
+        {
+          "start": 80,
+          "end": 98
+        }
+      ]
+    },
+    {
+      "id": "l6",
+      "title": "Desirable difficulty",
+      "category": "concept",
+      "sources": [
+        {
+          "start": 80,
+          "end": 98
+        },
+        {
+          "start": 255,
+          "end": 275
+        }
+      ]
+    },
+    {
+      "id": "l7",
+      "title": "Spanish vocabulary spacing schedule",
+      "category": "example",
+      "sources": [
+        {
+          "start": 98,
+          "end": 115
+        }
+      ]
+    },
+    {
+      "id": "l8",
+      "title": "Cards that are too broad",
+      "category": "mistake",
+      "sources": [
+        {
+          "start": 115,
+          "end": 135
+        }
+      ]
+    },
+    {
+      "id": "l9",
+      "title": "Highlighting without retrieval",
+      "category": "mistake",
+      "sources": [
+        {
+          "start": 135,
+          "end": 155
+        }
+      ]
+    },
+    {
+      "id": "l10",
+      "title": "Engineering, medicine, and music use cases",
+      "category": "application",
+      "sources": [
+        {
+          "start": 155,
+          "end": 175
+        }
+      ]
+    },
+    {
+      "id": "l11",
+      "title": "Massed practice fools short-term performance",
+      "category": "argument",
+      "sources": [
+        {
+          "start": 175,
+          "end": 195
+        }
+      ]
+    },
+    {
+      "id": "l12",
+      "title": "Start small: atomic cards, daily review",
+      "category": "application",
+      "sources": [
+        {
+          "start": 195,
+          "end": 215
+        }
+      ]
+    },
+    {
+      "id": "l13",
+      "title": "Rate honestly to keep the queue healthy",
+      "category": "takeaway",
+      "sources": [
+        {
+          "start": 215,
+          "end": 235
+        }
+      ]
+    },
+    {
+      "id": "l14",
+      "title": "Three takeaways: schedule, retrieve, keep cards small",
+      "category": "takeaway",
+      "sources": [
+        {
+          "start": 235,
+          "end": 255
+        }
+      ]
+    }
+  ]
+}
