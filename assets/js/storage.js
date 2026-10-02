@@ -668,16 +668,46 @@
       }
     }
 
-    // Video iframe
-    var iframe = document.getElementById('yt-player');
+    // Video iframe (shell may start at about:blank until hydrate)
     var embed = cfg.embedId || '';
+    if (lesson.video) {
+      if (lesson.video.embedId && /^[A-Za-z0-9_-]{11}$/.test(String(lesson.video.embedId))) {
+        embed = String(lesson.video.embedId);
+        cfg.embedId = embed;
+      } else if (/^[A-Za-z0-9_-]{11}$/.test(String(lesson.video.id || ''))) {
+        embed = String(lesson.video.id);
+        cfg.embedId = embed;
+      }
+    }
+    var frameWrap = document.getElementById('overview');
+    var iframe = document.getElementById('yt-player');
+    if (!iframe && frameWrap) {
+      iframe = document.createElement('iframe');
+      iframe.id = 'yt-player';
+      iframe.className = 'h-full w-full';
+      iframe.title = 'YouTube video';
+      iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+      iframe.setAttribute('allowfullscreen', 'allowfullscreen');
+      frameWrap.insertBefore(iframe, frameWrap.firstChild);
+    }
+    var placeholder = document.getElementById('yt-embed-placeholder');
     if (iframe && embed && /^[A-Za-z0-9_-]{11}$/.test(embed)) {
       var start = cfg.start || 0;
+      iframe.setAttribute('data-embed-id', embed);
       iframe.src =
         'https://www.youtube.com/embed/' +
         encodeURIComponent(embed) +
         '?enablejsapi=1&rel=0&modestbranding=1' +
         (start ? '&start=' + Math.floor(start) : '');
+      if (placeholder && placeholder.parentNode) {
+        placeholder.parentNode.removeChild(placeholder);
+      }
+      // Re-bind YT API player if available
+      if (typeof window.onYouTubeIframeAPIReady === 'function' && typeof YT !== 'undefined' && YT.Player) {
+        try {
+          window.onYouTubeIframeAPIReady();
+        } catch (ignore) {}
+      }
     }
 
     if (status) {

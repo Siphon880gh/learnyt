@@ -123,19 +123,24 @@ layout_header($title, array('nav' => 'home'));
 
   <!-- Video + TOC column -->
   <aside class="lg:col-span-5 xl:col-span-4 space-y-6 lg:sticky lg:top-20 lg:self-start">
-    <div class="video-frame w-full overflow-hidden rounded-xl bg-slate-900 shadow-sm" id="overview">
-      <?php if ($embedId !== ''): ?>
+    <div class="video-frame w-full overflow-hidden rounded-xl bg-slate-900 shadow-sm relative" id="overview">
+      <?php
+        // Always render the iframe so localStorage hydrate / seek can set src later.
+        $iframeSrc = $embedId !== '' ? youtube_embed_url($embedId, $embedStart) : 'about:blank';
+      ?>
       <iframe
         id="yt-player"
         class="h-full w-full"
-        src="<?= e(youtube_embed_url($embedId, $embedStart)) ?>"
+        src="<?= e($iframeSrc) ?>"
         data-embed-id="<?= e($embedId) ?>"
         title="YouTube video"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen
         loading="lazy"></iframe>
-      <?php else: ?>
-      <div class="h-full w-full flex items-center justify-center text-slate-300 text-sm p-6 text-center">No YouTube embed id for this lesson. Seeking still works via deep links once an embedId is set.</div>
+      <?php if ($embedId === ''): ?>
+      <div id="yt-embed-placeholder" class="absolute inset-0 flex items-center justify-center text-slate-300 text-sm p-6 text-center bg-slate-900 pointer-events-none">
+        No YouTube embed yet. It appears after the lesson loads (or set video.embedId / an 11-char video id).
+      </div>
       <?php endif; ?>
     </div>
 
