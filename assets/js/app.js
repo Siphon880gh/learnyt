@@ -378,6 +378,27 @@
   }
 
   function initLessonNav() {
+    const bar = document.getElementById('lesson-nav-bar');
+    if (bar && 'IntersectionObserver' in window) {
+      let sentinel = document.getElementById('lesson-nav-sentinel');
+      if (!sentinel) {
+        sentinel = document.createElement('div');
+        sentinel.id = 'lesson-nav-sentinel';
+        sentinel.setAttribute('aria-hidden', 'true');
+        sentinel.style.cssText = 'height:1px;margin:0;padding:0;pointer-events:none;';
+        bar.parentNode.insertBefore(sentinel, bar);
+      }
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            bar.classList.toggle('is-stuck', !entry.isIntersecting);
+          });
+        },
+        { rootMargin: '-56px 0px 0px 0px', threshold: 0 } // ~site header height
+      );
+      io.observe(sentinel);
+    }
+
     document.querySelectorAll('.lesson-nav-link').forEach((a) => {
       a.addEventListener('click', (e) => {
         const section = a.getAttribute('data-section');

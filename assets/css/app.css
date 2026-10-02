@@ -10,7 +10,7 @@
 }
 
 .transcript-seg {
-  scroll-margin-top: 6rem;
+  scroll-margin-top: 7.5rem; /* site header + sticky lesson nav */
   border-left: 2px solid transparent;
   transition: background-color 120ms ease, border-color 120ms ease;
 }
@@ -54,9 +54,30 @@
 }
 
 /* Diagrams */
-.diagram-card {
-  scroll-margin-top: 6rem;
+.diagram-card,
+#overview,
+#overview-panel,
+#transcript,
+#diagrams,
+#highlights,
+#chrono,
+#learn {
+  scroll-margin-top: 7.5rem; /* site header + sticky lesson nav */
 }
+
+#lesson-nav-bar {
+  /* sits under sticky site header (top-14); keep thin so content stays readable */
+  box-shadow: 0 1px 0 rgb(15 23 42 / 0.04);
+}
+
+#lesson-nav-bar.is-stuck {
+  box-shadow: 0 4px 12px rgb(15 23 42 / 0.06);
+}
+
+#lesson-nav .lesson-nav-link {
+  white-space: nowrap;
+}
+
 
 .diagram-inline {
   box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);

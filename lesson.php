@@ -91,9 +91,15 @@ layout_header($title, array('nav' => 'home'));
       </div>
     </div>
 
-    <nav class="mt-5 flex flex-wrap gap-1 text-sm" aria-label="Lesson sections" id="lesson-nav">
+  </div>
+</div>
+
+<!-- Sticks under site header (h-14) once scrolled past the title block -->
+<div id="lesson-nav-bar" class="sticky top-14 z-30 border-b border-slate-200/80 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/90">
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <nav class="flex flex-wrap gap-1 text-sm py-2" aria-label="Lesson sections" id="lesson-nav">
       <?php
-      $navItems = [
+      $navItems = array(
         'overview' => 'Overview',
         'chrono' => 'Chronological TOC',
         'learn' => 'Learning TOC',
@@ -101,7 +107,7 @@ layout_header($title, array('nav' => 'home'));
         'diagrams' => 'Diagrams',
         'highlights' => 'Highlights',
         'review' => 'Review',
-      ];
+      );
       foreach ($navItems as $key => $label):
         $href = $key === 'review' ? 'review.php?v=' . rawurlencode($videoId) : '#' . $key;
       ?>
