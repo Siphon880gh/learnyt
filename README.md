@@ -7,6 +7,8 @@
 
 By Weng (Weng Fei Fung). Generate transcripts, lessons, spaced repetition, infographics/diagrams for any Youtube video where learning is important.
 
+**No free tokens.** This is a free service so you'll have to use your own tokens. There are three ways: integrate your API key into the app, a prompt builder you copy into your own ChatGPT/Claude, or harness-first where you talk to the codebase to generate the artifacts you see in the rendered app. **Decision: harness-first.**
+
 Harness-first **YouTube → interactive learning modules**.
 
 You do **not** submit URLs through a web form. Open this project in an AI coding harness (Cursor, Claude Code, etc.), paste a YouTube URL in chat, and the local skill under `.agents/skills/youtube-lesson/` fetches the transcript, builds dual TOCs, diagrams/infographics, and writes lesson JSON. This PHP app renders lessons with highlights, deep links, visual breaks, and spaced repetition.

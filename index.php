@@ -18,7 +18,30 @@ layout_header('Home', array('nav' => 'home'));
     Turn YouTube into interactive study modules
   </h1>
   <p class="text-lg text-slate-600 leading-relaxed mb-10 max-w-readable">
-    You don’t paste URLs into a web form. Open this project in an AI coding harness,
+    You don’t paste URLs into a web form
+    <span class="relative inline-flex align-middle ml-0.5">
+      <button type="button"
+        id="tokens-info-btn"
+        class="inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 bg-white text-[11px] font-semibold italic text-slate-500 hover:border-slate-400 hover:text-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-1"
+        aria-expanded="false"
+        aria-controls="tokens-info-panel"
+        title="Why not paste a YouTube link here?">
+        <span class="sr-only">Why you don’t paste a YouTube link in the app</span>
+        i
+      </button>
+      <span id="tokens-info-panel"
+        role="region"
+        aria-labelledby="tokens-info-btn"
+        hidden
+        class="absolute left-0 top-full z-30 mt-2 w-72 sm:w-80 rounded-lg border border-slate-200 bg-white p-3 text-sm font-normal not-italic text-slate-600 leading-relaxed shadow-lg normal-case tracking-normal">
+        <strong class="font-medium text-slate-800">No free tokens.</strong>
+        This is a free service so you’ll have to use your own tokens. There are three ways:
+        integrate your API key into the app, a prompt builder you copy into your own ChatGPT/Claude,
+        or harness-first where you talk to the codebase to generate the artifacts you see in the rendered app.
+        <strong class="font-medium text-slate-800">Decision: harness-first.</strong>
+      </span>
+    </span>.
+    Open this project in an AI coding harness,
     drop a YouTube link in chat, and the local skill builds lesson JSON. Import that JSON
     into this browser (localStorage), study offline to the server, then optionally
     <strong class="font-medium text-slate-800">Sync to demo</strong> so any visitor of this app can open it.
@@ -141,6 +164,35 @@ layout_header('Home', array('nav' => 'home'));
     seedIds: <?= json_encode($seedIds) ?>,
     serverLessons: <?= json_encode($serverLessons, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>
   };
+  (function () {
+    var btn = document.getElementById('tokens-info-btn');
+    var panel = document.getElementById('tokens-info-panel');
+    if (!btn || !panel) return;
+    function setOpen(open) {
+      if (open) {
+        panel.removeAttribute('hidden');
+        btn.setAttribute('aria-expanded', 'true');
+      } else {
+        panel.setAttribute('hidden', 'hidden');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    }
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      setOpen(panel.hasAttribute('hidden'));
+    });
+    btn.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+    document.addEventListener('click', function (e) {
+      if (panel.hasAttribute('hidden')) return;
+      if (btn.contains(e.target) || panel.contains(e.target)) return;
+      setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+  })();
 </script>
 <?php
 layout_footer();
