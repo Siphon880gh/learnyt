@@ -70,10 +70,18 @@ layout_header('Home', array('nav' => 'home'));
       <span class="text-sm text-slate-500 hidden group-open:inline">Hide</span>
     </summary>
     <div class="px-5 pb-6 border-t border-slate-100 pt-5">
+      <p class="text-sm text-slate-600 leading-relaxed mb-5">
+        First download or clone the codebase locally from
+        <a class="font-medium text-slate-900 underline underline-offset-2 hover:text-slate-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 rounded"
+           href="https://github.com/Siphon880gh/youtube-learner"
+           target="_blank"
+           rel="noopener noreferrer">github.com/Siphon880gh/youtube-learner</a>
+        — the harness needs a local project folder, not just this live page.
+      </p>
       <ol class="space-y-5">
         <?php
         $steps = array(
-          array('Open the project', 'Open this folder in Cursor, Claude Code, or another AI coding harness with local tool access.'),
+          array('Open the project', 'Clone or download the github.com/Siphon880gh/youtube-learner repo first, then open that folder in Cursor, Claude Code, or another AI coding harness with local tool access.'),
           array('Paste a YouTube URL', 'In chat, give a video URL (or ID). Ask the agent to run the youtube-lesson skill.'),
           array('Skill builds lesson JSON', 'Transcript, dual TOCs, and diagrams → JSON matching docs/DATA_SCHEMA.md (may also write a file).'),
           array('Import in the browser', 'Paste or upload the lesson JSON below. It stays in localStorage until you sync.'),
