@@ -16,6 +16,11 @@ define('LEARNYT_DEMO_HIGHLIGHTS', LEARNYT_DEMO . '/highlights');
 define('LEARNYT_DEMO_SRS_FILE', LEARNYT_DEMO . '/srs.json');
 define('LEARNYT_SEED_IDS', 'sample-spaced-rep'); // comma-separated protected seed ids
 
+// YouTube embeds need a usable Referer (Error 153 otherwise, esp. iOS Safari).
+if (!headers_sent()) {
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+}
+
 // --- PHP 8.0 string helper polyfills (for PHP 7.4 / MAMP) ---
 if (!function_exists('str_starts_with')) {
     /**

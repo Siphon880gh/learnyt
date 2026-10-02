@@ -134,6 +134,7 @@ layout_header($title, array('nav' => 'home'));
         src="<?= e($iframeSrc) ?>"
         data-embed-id="<?= e($embedId) ?>"
         title="YouTube video"
+        referrerpolicy="strict-origin-when-cross-origin"
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen
         loading="lazy"></iframe>

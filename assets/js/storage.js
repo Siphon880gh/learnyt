@@ -686,6 +686,8 @@
       iframe.id = 'yt-player';
       iframe.className = 'h-full w-full';
       iframe.title = 'YouTube video';
+      iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
       iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
       iframe.setAttribute('allowfullscreen', 'allowfullscreen');
       frameWrap.insertBefore(iframe, frameWrap.firstChild);
@@ -694,6 +696,8 @@
     if (iframe && embed && /^[A-Za-z0-9_-]{11}$/.test(embed)) {
       var start = cfg.start || 0;
       iframe.setAttribute('data-embed-id', embed);
+      iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
       iframe.src =
         'https://www.youtube.com/embed/' +
         encodeURIComponent(embed) +

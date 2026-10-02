@@ -83,6 +83,8 @@
     const cfg = window.LEARNYT || {};
     const embed = cfg.embedId || cfg.videoId;
     if (iframe && embed && /^[A-Za-z0-9_-]{11}$/.test(embed)) {
+      iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
       iframe.src =
         'https://www.youtube.com/embed/' +
         encodeURIComponent(embed) +
