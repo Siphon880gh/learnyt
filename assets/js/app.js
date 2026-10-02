@@ -528,7 +528,7 @@
     const stage = root.querySelector('#diagram-lightbox-stage');
     const titleEl = root.querySelector('#diagram-lightbox-title');
     const closeBtn = root.querySelector('.diagram-lightbox-close');
-    let scale = 1.35;
+    let scale = 1;
     let lastFocus = null;
 
     function applyScale() {
@@ -545,7 +545,7 @@
       clone.removeAttribute('tabindex');
       clone.classList.add('diagram-lightbox-clone');
       stage.appendChild(clone);
-      scale = 1.35;
+      scale = 1;
       applyScale();
       lastFocus = document.activeElement;
       root.hidden = false;
@@ -588,7 +588,7 @@
         const mode = zoomBtn.getAttribute('data-lb-zoom');
         if (mode === 'in') scale = Math.min(3, Math.round((scale + 0.25) * 100) / 100);
         else if (mode === 'out') scale = Math.max(0.5, Math.round((scale - 0.25) * 100) / 100);
-        else scale = 1.35;
+        else scale = 1;
         applyScale();
         return;
       }
