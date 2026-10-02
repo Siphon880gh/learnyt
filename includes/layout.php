@@ -65,7 +65,10 @@ function layout_footer(array $opts = []): void
   <footer class="mt-20 border-t border-slate-200 py-10">
     <div class="mx-auto max-w-6xl px-4 sm:px-6 text-sm text-slate-500 flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
       <p>Harness-first YouTube → interactive learning. Local-only data.</p>
-      <p><a class="underline hover:text-slate-800" href="README.md">Docs</a></p>
+      <p class="flex flex-wrap gap-3">
+        <a class="underline hover:text-slate-800" href="https://github.com/Siphon880gh/youtube-learner" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a class="underline hover:text-slate-800" href="https://github.com/Siphon880gh/youtube-learner#readme" target="_blank" rel="noopener noreferrer">Docs</a>
+      </p>
     </div>
   </footer>
   <script src="assets/js/storage.js" defer></script>
