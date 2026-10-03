@@ -291,23 +291,16 @@ function sanitize_inline_svg($svg)
 
 /**
  * Compact Sync control: toggle + mode chevron menu.
- * $variant: sticky|video|transcript (styling only)
+ * Only the sticky lesson-nav instance is rendered.
  *
  * @param string $variant
  */
-function render_transcript_sync_control($variant = 'default')
+function render_transcript_sync_control($variant = 'sticky')
 {
-    $variant = (string) $variant;
-    $wrapExtra = '';
+    $wrapExtra = ' transcript-sync-control--sticky';
     $btnExtra = 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-900';
     $chevExtra = 'border-slate-300 bg-white text-slate-600 hover:bg-slate-50 focus-visible:ring-slate-900';
-    if ($variant === 'video') {
-        $wrapExtra = ' transcript-sync-control--video';
-        $btnExtra = 'border-white/25 bg-slate-900/85 text-white hover:bg-slate-800 focus-visible:ring-white';
-        $chevExtra = 'border-white/25 bg-slate-900/85 text-white hover:bg-slate-800 focus-visible:ring-white';
-    } elseif ($variant === 'sticky') {
-        $wrapExtra = ' transcript-sync-control--sticky';
-    }
+    unset($variant);
     ?>
     <div class="transcript-sync-control<?= e($wrapExtra) ?>" data-sync-control>
       <button type="button"

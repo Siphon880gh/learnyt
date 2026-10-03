@@ -95,8 +95,8 @@ layout_header($title, array('nav' => 'home'));
 </div>
 
 <!-- Sticks under site header (h-14) once scrolled past the title block -->
-<div id="lesson-nav-bar" class="sticky top-14 z-30 border-b border-slate-200/80 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/90">
-  <div class="mx-auto max-w-6xl px-4 sm:px-6 flex flex-wrap items-center justify-between gap-2 py-2">
+<div id="lesson-nav-bar" class="sticky top-14 z-30 border-b border-slate-200/80 bg-white/95">
+  <div class="lesson-nav-bar-inner mx-auto max-w-6xl px-4 sm:px-6 flex flex-wrap items-center justify-between gap-2 py-2">
     <nav class="flex flex-wrap gap-1 text-sm min-w-0" aria-label="Lesson sections" id="lesson-nav">
       <?php
       $navItems = array(
@@ -115,7 +115,7 @@ layout_header($title, array('nav' => 'home'));
          class="lesson-nav-link px-3 py-1.5 rounded-md text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900"><?= e($label) ?></a>
       <?php endforeach; ?>
     </nav>
-    <div class="shrink-0">
+    <div class="lesson-nav-sync shrink-0 ml-auto flex justify-end">
       <?php render_transcript_sync_control('sticky'); ?>
     </div>
   </div>
@@ -152,9 +152,6 @@ layout_header($title, array('nav' => 'home'));
         No YouTube embed yet. It appears after the lesson loads (or set video.embedId / an 11-char video id).
       </div>
       <?php endif; ?>
-      <div class="absolute top-2 right-2 z-10">
-        <?php render_transcript_sync_control('video'); ?>
-      </div>
     </div>
 
     <div class="rounded-xl border border-slate-200 bg-white p-4">
@@ -257,10 +254,7 @@ layout_header($title, array('nav' => 'home'));
     <section id="transcript" class="relative">
       <div class="flex items-center justify-between gap-3 mb-4">
         <h2 class="text-lg font-semibold text-slate-900">Interactive transcript</h2>
-        <div class="flex items-center gap-3">
-          <span class="text-xs text-slate-400"><?= count($transcript) ?> segments</span>
-          <?php render_transcript_sync_control('transcript'); ?>
-        </div>
+        <span class="text-xs text-slate-400 shrink-0"><?= count($transcript) ?> segments</span>
       </div>
 
       <!-- Selection toolbar (positioned by JS) -->

@@ -829,10 +829,25 @@
     function closeAllMenus() {
       document.querySelectorAll('.transcript-sync-menu').forEach(function (menu) {
         menu.hidden = true;
+        menu.classList.remove('is-flip-left');
       });
       document.querySelectorAll('.js-transcript-sync-mode-btn').forEach(function (btn) {
         btn.setAttribute('aria-expanded', 'false');
       });
+    }
+
+    /** Keep the mode menu inside the viewport (right-aligned control opens left). */
+    function placeMenu(menu) {
+      menu.classList.remove('is-flip-left');
+      var rect = menu.getBoundingClientRect();
+      var pad = 8;
+      if (rect.right > window.innerWidth - pad || rect.left < pad) {
+        menu.classList.add('is-flip-left');
+        rect = menu.getBoundingClientRect();
+        if (rect.right > window.innerWidth - pad) {
+          menu.classList.remove('is-flip-left');
+        }
+      }
     }
 
     function stopLoop() {
@@ -990,6 +1005,7 @@
           if (open) {
             menu.hidden = false;
             modeBtn.setAttribute('aria-expanded', 'true');
+            placeMenu(menu);
           }
         });
       }

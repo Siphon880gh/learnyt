@@ -68,6 +68,23 @@
 #lesson-nav-bar {
   /* sits under sticky site header (top-14); keep thin so content stays readable */
   box-shadow: 0 1px 0 rgb(15 23 42 / 0.04);
+  /* backdrop-filter would clip the mode menu; solid fill instead */
+  overflow: visible;
+}
+
+#lesson-nav-bar .lesson-nav-bar-inner,
+#lesson-nav-bar .lesson-nav-sync {
+  overflow: visible;
+}
+
+/* Narrow screens: own row, pinned to the right so the menu opens inward. */
+@media (max-width: 640px) {
+  #lesson-nav-bar .lesson-nav-sync {
+    flex: 1 0 100%;
+    margin-left: auto;
+    display: flex;
+    justify-content: flex-end;
+  }
 }
 
 #lesson-nav-bar.is-stuck {
@@ -251,22 +268,19 @@ body.diagram-lightbox-open {
 
 
 
-/* Transcript ↔ video sync control (sticky + video + transcript) */
+/* Transcript sync control (sticky lesson nav only) */
 .transcript-sync-control {
   position: relative;
   display: inline-flex;
   align-items: stretch;
   vertical-align: middle;
+  overflow: visible;
 }
 
 .transcript-sync-sep {
   width: 1px;
   align-self: stretch;
   background: rgb(203 213 225);
-}
-
-.transcript-sync-control--video .transcript-sync-sep {
-  background: rgb(255 255 255 / 0.28);
 }
 
 .transcript-sync-toggle {
@@ -284,28 +298,25 @@ body.diagram-lightbox-open {
   border-color: rgb(15 23 42);
 }
 
-.transcript-sync-control--video.is-sync-on .transcript-sync-toggle,
-.transcript-sync-control--video.is-sync-on .transcript-sync-mode-btn {
-  background: rgb(16 185 129);
-  border-color: rgb(52 211 153);
-  color: #fff;
-}
-
-.transcript-sync-control--video.is-sync-on .transcript-sync-sep {
-  background: rgb(255 255 255 / 0.45);
-}
-
 .transcript-sync-menu {
   position: absolute;
   right: 0;
+  left: auto;
   top: calc(100% + 0.35rem);
-  z-index: 50;
+  z-index: 60;
   min-width: 12rem;
+  max-width: calc(100vw - 1.5rem);
   padding: 0.25rem;
   border-radius: 0.5rem;
   border: 1px solid rgb(226 232 240);
   background: #fff;
   box-shadow: 0 10px 30px rgb(15 23 42 / 0.12);
+}
+
+/* Control sits on the right of the nav bar, so the menu opens inward (left). */
+.transcript-sync-menu.is-flip-left {
+  right: auto;
+  left: 0;
 }
 
 .transcript-sync-mode-option {
@@ -334,5 +345,5 @@ body.diagram-lightbox-open {
 }
 
 .transcript-sync-control--sticky {
-  /* Lives in sticky lesson nav; always reachable while reading */
+  /* Right side of the sticky lesson nav so the menu stays on screen */
 }
