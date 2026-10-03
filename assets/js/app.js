@@ -518,6 +518,7 @@
         '<button type="button" class="diagram-lightbox-btn" data-lb-zoom="out" aria-label="Zoom out">−</button>' +
         '<button type="button" class="diagram-lightbox-btn" data-lb-zoom="reset" aria-label="Reset zoom">100%</button>' +
         '<button type="button" class="diagram-lightbox-btn" data-lb-zoom="in" aria-label="Zoom in">+</button>' +
+        '<button type="button" class="diagram-lightbox-btn" data-lb-zoom="fit" aria-label="Zoom to fit">Zoom to fit</button>' +
         '<button type="button" class="diagram-lightbox-btn diagram-lightbox-close" data-lb-close aria-label="Close enlarged diagram">Close</button>' +
         '</div></div>' +
         '<div class="diagram-lightbox-stage-wrap"><div class="diagram-lightbox-stage" id="diagram-lightbox-stage"></div></div>' +
@@ -526,13 +527,84 @@
     }
 
     const stage = root.querySelector('#diagram-lightbox-stage');
+    const wrap = root.querySelector('.diagram-lightbox-stage-wrap');
     const titleEl = root.querySelector('#diagram-lightbox-title');
     const closeBtn = root.querySelector('.diagram-lightbox-close');
+    const FIT_CAP = 1.5;
     let scale = 1;
     let lastFocus = null;
 
     function applyScale() {
       stage.style.transform = 'scale(' + scale + ')';
+    }
+
+    function naturalContentSize(clone) {
+      const img = clone.querySelector('img');
+      if (img) {
+        const w = img.naturalWidth || img.width || 0;
+        const h = img.naturalHeight || img.height || 0;
+        if (w > 0 && h > 0) return { w: w, h: h };
+      }
+      const svg = clone.querySelector('svg');
+      if (svg) {
+        if (svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width && svg.viewBox.baseVal.height) {
+          return { w: svg.viewBox.baseVal.width, h: svg.viewBox.baseVal.height };
+        }
+        const attrW = parseFloat(svg.getAttribute('width') || '');
+        const attrH = parseFloat(svg.getAttribute('height') || '');
+        if (attrW > 0 && attrH > 0) return { w: attrW, h: attrH };
+        try {
+          const bbox = svg.getBBox();
+          if (bbox && bbox.width > 0 && bbox.height > 0) return { w: bbox.width, h: bbox.height };
+        } catch (_) {}
+      }
+      const rect = clone.getBoundingClientRect();
+      const inv = scale > 0 ? 1 / scale : 1;
+      return {
+        w: Math.max(1, rect.width * inv),
+        h: Math.max(1, rect.height * inv),
+      };
+    }
+
+    function computeFitScale() {
+      const clone = stage.querySelector('.diagram-lightbox-clone');
+      if (!clone || !wrap) return 1;
+      // Measure against the content area (nearly full viewport minus toolbar/chrome).
+      const availW = Math.max(1, wrap.clientWidth - 16);
+      const availH = Math.max(1, wrap.clientHeight - 16);
+      // Temporarily clear transform so getBoundingClientRect is at 1x if we fall back to it.
+      const prev = stage.style.transform;
+      stage.style.transform = 'scale(1)';
+      const size = naturalContentSize(clone);
+      stage.style.transform = prev;
+      if (!size.w || !size.h) return 1;
+      const fit = Math.min(availW / size.w, availH / size.h);
+      // Scale down freely to fit; scale up at most 150%.
+      return Math.min(fit, FIT_CAP);
+    }
+
+    function zoomToFit() {
+      scale = Math.round(computeFitScale() * 1000) / 1000;
+      if (!isFinite(scale) || scale <= 0) scale = 1;
+      applyScale();
+    }
+
+    function waitForMedia(clone, done) {
+      const img = clone.querySelector('img');
+      if (img && !img.complete) {
+        const finish = function () {
+          img.removeEventListener('load', finish);
+          img.removeEventListener('error', finish);
+          done();
+        };
+        img.addEventListener('load', finish);
+        img.addEventListener('error', finish);
+        return;
+      }
+      // Mermaid/SVG may need a frame after paint.
+      requestAnimationFrame(function () {
+        requestAnimationFrame(done);
+      });
     }
 
     function openFrom(body) {
@@ -544,6 +616,13 @@
       clone.removeAttribute('role');
       clone.removeAttribute('tabindex');
       clone.classList.add('diagram-lightbox-clone');
+      // Prefer intrinsic sizing so fit math uses natural dimensions.
+      clone.querySelectorAll('img, svg').forEach(function (el) {
+        el.style.maxWidth = 'none';
+        el.style.maxHeight = 'none';
+        el.style.width = 'auto';
+        el.style.height = 'auto';
+      });
       stage.appendChild(clone);
       scale = 1;
       applyScale();
@@ -551,6 +630,7 @@
       root.hidden = false;
       document.body.classList.add('diagram-lightbox-open');
       closeBtn.focus();
+      waitForMedia(clone, zoomToFit);
     }
 
     function close() {
@@ -586,10 +666,18 @@
       const zoomBtn = e.target.closest('[data-lb-zoom]');
       if (zoomBtn && root.contains(zoomBtn) && !root.hidden) {
         const mode = zoomBtn.getAttribute('data-lb-zoom');
-        if (mode === 'in') scale = Math.min(3, Math.round((scale + 0.25) * 100) / 100);
-        else if (mode === 'out') scale = Math.max(0.5, Math.round((scale - 0.25) * 100) / 100);
-        else scale = 1;
-        applyScale();
+        if (mode === 'fit') {
+          zoomToFit();
+        } else if (mode === 'in') {
+          scale = Math.min(3, Math.round((scale + 0.25) * 100) / 100);
+          applyScale();
+        } else if (mode === 'out') {
+          scale = Math.max(0.5, Math.round((scale - 0.25) * 100) / 100);
+          applyScale();
+        } else {
+          scale = 1;
+          applyScale();
+        }
         return;
       }
       if (e.target.closest('a, button')) return;
