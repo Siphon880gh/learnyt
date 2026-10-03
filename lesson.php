@@ -149,6 +149,12 @@ layout_header($title, array('nav' => 'home'));
         No YouTube embed yet. It appears after the lesson loads (or set video.embedId / an 11-char video id).
       </div>
       <?php endif; ?>
+      <button type="button"
+        class="js-transcript-sync absolute top-2 right-2 z-10 rounded-md border border-white/25 bg-slate-900/85 px-2.5 py-1 text-xs font-medium text-white shadow backdrop-blur hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-white"
+        aria-pressed="false"
+        title="When on, scroll the transcript to match the playing video">
+        Sync
+      </button>
     </div>
 
     <div class="rounded-xl border border-slate-200 bg-white p-4">
@@ -249,9 +255,17 @@ layout_header($title, array('nav' => 'home'));
     </section>
 
     <section id="transcript" class="relative">
-      <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center justify-between gap-3 mb-4">
         <h2 class="text-lg font-semibold text-slate-900">Interactive transcript</h2>
-        <span class="text-xs text-slate-400"><?= count($transcript) ?> segments</span>
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-slate-400"><?= count($transcript) ?> segments</span>
+          <button type="button"
+            class="js-transcript-sync inline-flex items-center rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900"
+            aria-pressed="false"
+            title="When on, scroll the transcript to match the playing video">
+            Sync
+          </button>
+        </div>
       </div>
 
       <!-- Selection toolbar (positioned by JS) -->

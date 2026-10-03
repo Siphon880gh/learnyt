@@ -249,3 +249,17 @@ body.diagram-lightbox-open {
   margin: 0;
 }
 
+
+
+/* Transcript ↔ video sync toggle */
+.js-transcript-sync.is-sync-on {
+  background: rgb(15 23 42);
+  color: #fff;
+  border-color: rgb(15 23 42);
+}
+
+#overview .js-transcript-sync.is-sync-on {
+  background: rgb(16 185 129);
+  border-color: rgb(52 211 153);
+  color: #fff;
+}

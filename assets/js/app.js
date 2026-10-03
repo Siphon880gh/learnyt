@@ -54,16 +54,35 @@
 
   // --- YouTube player ---
   let ytPlayer = null;
+  let transcriptSyncOn = false;
+  let transcriptSyncTimer = null;
+  let transcriptSyncLastId = null;
+  const transcriptSyncListeners = [];
+
+  function notifyTranscriptSync(state) {
+    transcriptSyncListeners.forEach(function (fn) {
+      try { fn(state); } catch (_) {}
+    });
+  }
+
   window.onYouTubeIframeAPIReady = function () {
     const iframe = document.getElementById('yt-player');
     if (!iframe || typeof YT === 'undefined') return;
+    // Avoid double-wrapping the same iframe if already a Player.
+    try {
+      if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function') return;
+    } catch (_) {}
     ytPlayer = new YT.Player('yt-player', {
       events: {
-        onReady: () => {
+        onReady: function () {
           const start = (window.LEARNYT && window.LEARNYT.start) || 0;
           if (start > 0 && ytPlayer && ytPlayer.seekTo) {
             try { ytPlayer.seekTo(start, true); } catch (_) {}
           }
+          notifyTranscriptSync('ready');
+        },
+        onStateChange: function (ev) {
+          notifyTranscriptSync(ev && typeof ev.data !== 'undefined' ? ev.data : null);
         },
       },
     });
@@ -91,6 +110,13 @@
         '?enablejsapi=1&rel=0&modestbranding=1&start=' +
         Math.floor(t) +
         '&autoplay=1';
+      ytPlayer = null;
+      // Rebind IFrame API after src swap so Sync can read currentTime again.
+      setTimeout(function () {
+        if (typeof YT !== 'undefined' && YT.Player) {
+          try { window.onYouTubeIframeAPIReady(); } catch (_) {}
+        }
+      }, 400);
     }
   }
 
@@ -766,6 +792,106 @@
     }
   }
 
+  function initTranscriptSync() {
+    const buttons = document.querySelectorAll('.js-transcript-sync');
+    if (!buttons.length) return;
+
+    function setButtons(on) {
+      buttons.forEach(function (btn) {
+        btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        btn.classList.toggle('is-sync-on', on);
+        btn.textContent = on ? 'Sync on' : 'Sync';
+      });
+    }
+
+    function stopLoop() {
+      if (transcriptSyncTimer) {
+        clearInterval(transcriptSyncTimer);
+        transcriptSyncTimer = null;
+      }
+    }
+
+    function ensurePlayer() {
+      if (ytPlayer && typeof ytPlayer.getCurrentTime === 'function') return true;
+      if (typeof YT !== 'undefined' && YT.Player) {
+        try { window.onYouTubeIframeAPIReady(); } catch (_) {}
+      }
+      return !!(ytPlayer && typeof ytPlayer.getCurrentTime === 'function');
+    }
+
+    function segmentForTime(t) {
+      const segs = document.querySelectorAll('.transcript-seg');
+      let best = null;
+      for (let i = 0; i < segs.length; i++) {
+        const start = Number(segs[i].dataset.start);
+        if (!isNaN(start) && start <= t) best = segs[i];
+      }
+      return best;
+    }
+
+    function followAt(t) {
+      const seg = segmentForTime(t);
+      if (!seg) return;
+      const id = seg.dataset.segId || seg.id || '';
+      if (id && id === transcriptSyncLastId) return;
+      transcriptSyncLastId = id;
+      document.querySelectorAll('.transcript-seg.is-active').forEach(function (s) {
+        s.classList.remove('is-active');
+      });
+      seg.classList.add('is-active');
+      seg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function tick() {
+      if (!transcriptSyncOn) return;
+      if (!ensurePlayer()) return;
+      let t = 0;
+      try {
+        t = ytPlayer.getCurrentTime();
+      } catch (_) {
+        return;
+      }
+      if (typeof t !== 'number' || isNaN(t)) return;
+      followAt(t);
+    }
+
+    function startLoop() {
+      stopLoop();
+      transcriptSyncTimer = setInterval(tick, 250);
+      tick();
+    }
+
+    function setSync(on) {
+      transcriptSyncOn = !!on;
+      setButtons(transcriptSyncOn);
+      if (transcriptSyncOn) {
+        transcriptSyncLastId = null;
+        ensurePlayer();
+        startLoop();
+      } else {
+        stopLoop();
+      }
+    }
+
+    buttons.forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        setSync(!transcriptSyncOn);
+      });
+    });
+
+    transcriptSyncListeners.push(function (state) {
+      if (!transcriptSyncOn) return;
+      // YT.PlayerState.PLAYING === 1
+      if (state === 1 || state === 'ready') startLoop();
+      else if (state === 2 || state === 0) {
+        // paused / ended: one last tick, keep interval so scrubbing still updates lightly
+        tick();
+      }
+    });
+
+    setButtons(false);
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     if (window.LearnytStorage && window.LEARNYT && window.LEARNYT.hydrateLocal) {
       window.LearnytStorage.hydrateLessonPage();
@@ -780,6 +906,7 @@
     initMermaid();
     initDiagrams();
     initDiagramLightbox();
+    initTranscriptSync();
     // If YT API already loaded
     if (typeof YT !== 'undefined' && YT.Player && !ytPlayer) {
       window.onYouTubeIframeAPIReady();
