@@ -532,54 +532,71 @@
     const closeBtn = root.querySelector('.diagram-lightbox-close');
     const FIT_CAP = 1.5;
     let scale = 1;
+    let base = { w: 0, h: 0 };
     let lastFocus = null;
 
-    function applyScale() {
-      stage.style.transform = 'scale(' + scale + ')';
+    function visualOf(clone) {
+      return clone ? clone.querySelector('img, svg') : null;
     }
 
-    function naturalContentSize(clone) {
-      const img = clone.querySelector('img');
-      if (img) {
-        const w = img.naturalWidth || img.width || 0;
-        const h = img.naturalHeight || img.height || 0;
-        if (w > 0 && h > 0) return { w: w, h: h };
+    function readBaseSize(visual, sourceBody) {
+      if (visual && visual.tagName === 'IMG') {
+        const w = visual.naturalWidth || 0;
+        const h = visual.naturalHeight || 0;
+        if (w > 1 && h > 1) return { w: w, h: h };
       }
-      const svg = clone.querySelector('svg');
-      if (svg) {
-        if (svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width && svg.viewBox.baseVal.height) {
-          return { w: svg.viewBox.baseVal.width, h: svg.viewBox.baseVal.height };
+      if (visual && visual.tagName === 'SVG') {
+        const vb = visual.viewBox && visual.viewBox.baseVal;
+        if (vb && vb.width > 1 && vb.height > 1) {
+          return { w: vb.width, h: vb.height };
         }
-        const attrW = parseFloat(svg.getAttribute('width') || '');
-        const attrH = parseFloat(svg.getAttribute('height') || '');
-        if (attrW > 0 && attrH > 0) return { w: attrW, h: attrH };
+        const attrW = visual.getAttribute('width') || '';
+        const attrH = visual.getAttribute('height') || '';
+        if (attrW.indexOf('%') === -1 && attrH.indexOf('%') === -1) {
+          const w = parseFloat(attrW);
+          const h = parseFloat(attrH);
+          if (w > 1 && h > 1) return { w: w, h: h };
+        }
         try {
-          const bbox = svg.getBBox();
-          if (bbox && bbox.width > 0 && bbox.height > 0) return { w: bbox.width, h: bbox.height };
+          const bbox = visual.getBBox();
+          if (bbox && bbox.width > 1 && bbox.height > 1) return { w: bbox.width, h: bbox.height };
         } catch (_) {}
       }
-      const rect = clone.getBoundingClientRect();
-      const inv = scale > 0 ? 1 / scale : 1;
-      return {
-        w: Math.max(1, rect.width * inv),
-        h: Math.max(1, rect.height * inv),
-      };
+      const src = sourceBody && sourceBody.querySelector('img, svg');
+      if (src) {
+        const r = src.getBoundingClientRect();
+        if (r.width > 2 && r.height > 2) return { w: r.width, h: r.height };
+      }
+      return { w: 640, h: 360 };
+    }
+
+    function applyScale() {
+      const clone = stage.querySelector('.diagram-lightbox-clone');
+      const visual = visualOf(clone);
+      if (!visual || !base.w || !base.h) return;
+      const w = Math.max(1, Math.round(base.w * scale));
+      const h = Math.max(1, Math.round(base.h * scale));
+      // Pixel layout size (not transform) so the graphic stays in view and centered.
+      visual.style.width = w + 'px';
+      visual.style.height = h + 'px';
+      visual.style.maxWidth = 'none';
+      visual.style.maxHeight = 'none';
+      if (visual.tagName === 'SVG') {
+        visual.setAttribute('width', String(w));
+        visual.setAttribute('height', String(h));
+        if (!visual.getAttribute('viewBox') && base.w && base.h) {
+          visual.setAttribute('viewBox', '0 0 ' + base.w + ' ' + base.h);
+        }
+      }
+      stage.style.transform = 'none';
     }
 
     function computeFitScale() {
-      const clone = stage.querySelector('.diagram-lightbox-clone');
-      if (!clone || !wrap) return 1;
-      // Measure against the content area (nearly full viewport minus toolbar/chrome).
+      if (!wrap || !base.w || !base.h) return 1;
       const availW = Math.max(1, wrap.clientWidth - 16);
       const availH = Math.max(1, wrap.clientHeight - 16);
-      // Temporarily clear transform so getBoundingClientRect is at 1x if we fall back to it.
-      const prev = stage.style.transform;
-      stage.style.transform = 'scale(1)';
-      const size = naturalContentSize(clone);
-      stage.style.transform = prev;
-      if (!size.w || !size.h) return 1;
-      const fit = Math.min(availW / size.w, availH / size.h);
-      // Scale down freely to fit; scale up at most 150%.
+      const fit = Math.min(availW / base.w, availH / base.h);
+      // Scale down freely so the whole image fits; scale up at most 150%.
       return Math.min(fit, FIT_CAP);
     }
 
@@ -616,13 +633,18 @@
       clone.removeAttribute('role');
       clone.removeAttribute('tabindex');
       clone.classList.add('diagram-lightbox-clone');
-      // Prefer intrinsic sizing so fit math uses natural dimensions.
-      clone.querySelectorAll('img, svg').forEach(function (el) {
-        el.style.maxWidth = 'none';
-        el.style.maxHeight = 'none';
-        el.style.width = 'auto';
-        el.style.height = 'auto';
-      });
+      const visual = visualOf(clone);
+      base = readBaseSize(visual, body);
+      if (visual && visual.tagName === 'SVG') {
+        const attrW = visual.getAttribute('width') || '';
+        const attrH = visual.getAttribute('height') || '';
+        if (attrW.indexOf('%') !== -1) visual.removeAttribute('width');
+        if (attrH.indexOf('%') !== -1) visual.removeAttribute('height');
+        visual.style.width = '';
+        visual.style.height = '';
+        visual.style.maxWidth = 'none';
+        visual.style.maxHeight = 'none';
+      }
       stage.appendChild(clone);
       scale = 1;
       applyScale();
@@ -630,7 +652,13 @@
       root.hidden = false;
       document.body.classList.add('diagram-lightbox-open');
       closeBtn.focus();
-      waitForMedia(clone, zoomToFit);
+      waitForMedia(clone, function () {
+        const again = visualOf(clone);
+        if (again && again.tagName === 'IMG' && again.naturalWidth > 1) {
+          base = { w: again.naturalWidth, h: again.naturalHeight };
+        }
+        zoomToFit();
+      });
     }
 
     function close() {
