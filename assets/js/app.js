@@ -404,8 +404,25 @@
     });
   }
 
+  function syncStickyStack() {
+    const header = document.querySelector('body > header');
+    const bar = document.getElementById('lesson-nav-bar');
+    const headerH = header ? header.getBoundingClientRect().height : 56;
+    const barH = bar ? bar.getBoundingClientRect().height : 52;
+    const px = Math.ceil(headerH + barH);
+    document.documentElement.style.setProperty('--sticky-stack', px + 'px');
+  }
+
   function initLessonNav() {
     const bar = document.getElementById('lesson-nav-bar');
+    syncStickyStack();
+    window.addEventListener('resize', syncStickyStack);
+    if (bar && 'ResizeObserver' in window) {
+      const ro = new ResizeObserver(syncStickyStack);
+      ro.observe(bar);
+      const header = document.querySelector('body > header');
+      if (header) ro.observe(header);
+    }
     if (bar && 'IntersectionObserver' in window) {
       let sentinel = document.getElementById('lesson-nav-sentinel');
       if (!sentinel) {

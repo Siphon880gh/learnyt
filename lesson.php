@@ -137,7 +137,7 @@ layout_header($title, array('nav' => 'home'));
      data-toc="<?= e($tocMode) ?>">
 
   <!-- Video + TOC column -->
-  <aside class="lg:col-span-5 xl:col-span-4 space-y-6 lg:sticky lg:top-20 lg:self-start">
+  <aside class="lesson-video-col lg:col-span-5 xl:col-span-4 space-y-6 lg:self-start">
     <div class="video-frame w-full overflow-hidden rounded-xl bg-slate-900 shadow-sm relative" id="overview">
       <?php
         // Always render the iframe so localStorage hydrate / seek can set src later.

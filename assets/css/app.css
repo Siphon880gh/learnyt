@@ -48,6 +48,25 @@
   aspect-ratio: 16 / 9;
 }
 
+/* Header (3.5rem) + lesson nav. JS sets --sticky-stack from measured heights.
+   Fallback clears both bars before measure so the player is not covered. */
+:root {
+  --sticky-stack: 7.75rem;
+}
+
+@media (min-width: 1024px) {
+  .lesson-video-col {
+    position: sticky;
+    top: calc(var(--sticky-stack) + 0.5rem);
+    align-self: start;
+    z-index: 10;
+  }
+}
+
+#overview {
+  scroll-margin-top: calc(var(--sticky-stack) + 0.5rem);
+}
+
 /* Reveal card for SRS */
 .srs-answer[hidden] {
   display: none !important;
@@ -62,7 +81,7 @@
 #highlights,
 #chrono,
 #learn {
-  scroll-margin-top: 7.5rem; /* site header + sticky lesson nav */
+  scroll-margin-top: calc(var(--sticky-stack, 7.75rem) + 0.5rem);
 }
 
 #lesson-nav-bar {
