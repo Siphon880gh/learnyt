@@ -287,3 +287,49 @@ function sanitize_inline_svg($svg)
     }
     return $svg;
 }
+
+
+/**
+ * Compact Sync control: toggle + mode chevron menu.
+ * $variant: sticky|video|transcript (styling only)
+ *
+ * @param string $variant
+ */
+function render_transcript_sync_control($variant = 'default')
+{
+    $variant = (string) $variant;
+    $wrapExtra = '';
+    $btnExtra = 'border-slate-300 bg-white text-slate-700 hover:bg-slate-50 focus-visible:ring-slate-900';
+    $chevExtra = 'border-slate-300 bg-white text-slate-600 hover:bg-slate-50 focus-visible:ring-slate-900';
+    if ($variant === 'video') {
+        $wrapExtra = ' transcript-sync-control--video';
+        $btnExtra = 'border-white/25 bg-slate-900/85 text-white hover:bg-slate-800 focus-visible:ring-white';
+        $chevExtra = 'border-white/25 bg-slate-900/85 text-white hover:bg-slate-800 focus-visible:ring-white';
+    } elseif ($variant === 'sticky') {
+        $wrapExtra = ' transcript-sync-control--sticky';
+    }
+    ?>
+    <div class="transcript-sync-control<?= e($wrapExtra) ?>" data-sync-control>
+      <button type="button"
+        class="js-transcript-sync transcript-sync-toggle inline-flex items-center rounded-l-md border px-2.5 py-1 text-xs font-medium focus:outline-none focus-visible:ring-2 <?= e($btnExtra) ?>"
+        aria-pressed="false"
+        title="Follow the playing video in the transcript">
+        Sync
+      </button>
+      <span class="transcript-sync-sep" aria-hidden="true"></span>
+      <button type="button"
+        class="js-transcript-sync-mode-btn transcript-sync-mode-btn inline-flex items-center justify-center rounded-r-md border border-l-0 px-1.5 py-1 focus:outline-none focus-visible:ring-2 <?= e($chevExtra) ?>"
+        aria-haspopup="menu"
+        aria-expanded="false"
+        aria-label="Sync scroll mode"
+        title="Scroll mode">
+        <svg class="h-3.5 w-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.17l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+      </button>
+      <div class="transcript-sync-menu" role="menu" hidden>
+        <button type="button" role="menuitemradio" class="transcript-sync-mode-option" data-sync-mode="none" aria-checked="false">No scrolling</button>
+        <button type="button" role="menuitemradio" class="transcript-sync-mode-option" data-sync-mode="ease" aria-checked="true">Ease snap</button>
+        <button type="button" role="menuitemradio" class="transcript-sync-mode-option" data-sync-mode="continuous" aria-checked="false">Continuous scrolling</button>
+      </div>
+    </div>
+    <?php
+}

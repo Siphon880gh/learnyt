@@ -55,6 +55,7 @@
   // --- YouTube player ---
   let ytPlayer = null;
   let transcriptSyncOn = false;
+  let transcriptSyncMode = 'ease'; // none | ease | continuous
   let transcriptSyncTimer = null;
   let transcriptSyncLastId = null;
   const transcriptSyncListeners = [];
@@ -793,14 +794,44 @@
   }
 
   function initTranscriptSync() {
-    const buttons = document.querySelectorAll('.js-transcript-sync');
-    if (!buttons.length) return;
+    const controls = document.querySelectorAll('[data-sync-control]');
+    if (!controls.length) return;
 
-    function setButtons(on) {
-      buttons.forEach(function (btn) {
+    const MODE_LABELS = {
+      none: 'No scrolling',
+      ease: 'Ease snap',
+      continuous: 'Continuous scrolling',
+    };
+
+    function setToggleUi(on) {
+      document.querySelectorAll('.js-transcript-sync').forEach(function (btn) {
         btn.setAttribute('aria-pressed', on ? 'true' : 'false');
         btn.classList.toggle('is-sync-on', on);
         btn.textContent = on ? 'Sync on' : 'Sync';
+      });
+      document.querySelectorAll('[data-sync-control]').forEach(function (el) {
+        el.classList.toggle('is-sync-on', on);
+      });
+    }
+
+    function setModeUi(mode) {
+      transcriptSyncMode = mode;
+      document.querySelectorAll('.transcript-sync-mode-option').forEach(function (opt) {
+        const on = opt.getAttribute('data-sync-mode') === mode;
+        opt.setAttribute('aria-checked', on ? 'true' : 'false');
+        opt.classList.toggle('is-selected', on);
+      });
+      document.querySelectorAll('.js-transcript-sync-mode-btn').forEach(function (btn) {
+        btn.title = 'Scroll mode: ' + (MODE_LABELS[mode] || mode);
+      });
+    }
+
+    function closeAllMenus() {
+      document.querySelectorAll('.transcript-sync-menu').forEach(function (menu) {
+        menu.hidden = true;
+      });
+      document.querySelectorAll('.js-transcript-sync-mode-btn').forEach(function (btn) {
+        btn.setAttribute('aria-expanded', 'false');
       });
     }
 
@@ -829,67 +860,163 @@
       return best;
     }
 
-    function followAt(t) {
-      const seg = segmentForTime(t);
-      if (!seg) return;
-      const id = seg.dataset.segId || seg.id || '';
-      if (id && id === transcriptSyncLastId) return;
-      transcriptSyncLastId = id;
+    function markActive(seg) {
       document.querySelectorAll('.transcript-seg.is-active').forEach(function (s) {
         s.classList.remove('is-active');
       });
-      seg.classList.add('is-active');
-      seg.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      if (seg) seg.classList.add('is-active');
     }
 
-    function tick() {
-      if (!transcriptSyncOn) return;
-      if (!ensurePlayer()) return;
-      let t = 0;
-      try {
-        t = ytPlayer.getCurrentTime();
-      } catch (_) {
+    function easeSnapTo(seg) {
+      if (!seg) return;
+      seg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function continuousTrack(seg, t) {
+      if (!seg) return;
+      const start = Number(seg.dataset.start) || 0;
+      const end = Number(seg.dataset.end);
+      const span = Math.max(0.05, (isNaN(end) ? start + 1 : end) - start);
+      const progress = Math.min(1, Math.max(0, (t - start) / span));
+      const rect = seg.getBoundingClientRect();
+      // Keep the reading point near ~40% of the viewport.
+      const targetY = window.innerHeight * 0.4;
+      const pointY = rect.top + rect.height * progress;
+      const delta = pointY - targetY;
+      if (Math.abs(delta) > 6) {
+        window.scrollBy({ top: delta, left: 0, behavior: 'auto' });
+      }
+    }
+
+    /**
+     * @param {number} t
+     * @param {{forceSnap?: boolean, force?: boolean}} opts
+     */
+    function followAt(t, opts) {
+      opts = opts || {};
+      const seg = segmentForTime(t);
+      if (!seg) return;
+      const id = seg.dataset.segId || seg.id || '';
+      const changed = !(id && id === transcriptSyncLastId);
+      if (changed || opts.force) {
+        transcriptSyncLastId = id;
+        markActive(seg);
+      }
+
+      if (opts.forceSnap) {
+        easeSnapTo(seg);
         return;
       }
-      if (typeof t !== 'number' || isNaN(t)) return;
-      followAt(t);
+
+      if (transcriptSyncMode === 'none') {
+        return;
+      }
+      if (transcriptSyncMode === 'ease') {
+        if (changed) easeSnapTo(seg);
+        return;
+      }
+      if (transcriptSyncMode === 'continuous') {
+        continuousTrack(seg, t);
+      }
+    }
+
+    function currentTime() {
+      if (!ensurePlayer()) return null;
+      try {
+        const t = ytPlayer.getCurrentTime();
+        if (typeof t !== 'number' || isNaN(t)) return null;
+        return t;
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function tick(opts) {
+      if (!transcriptSyncOn) return;
+      const t = currentTime();
+      if (t === null) return;
+      followAt(t, opts || {});
     }
 
     function startLoop() {
       stopLoop();
-      transcriptSyncTimer = setInterval(tick, 250);
-      tick();
+      const ms = transcriptSyncMode === 'continuous' ? 100 : 250;
+      transcriptSyncTimer = setInterval(function () { tick(); }, ms);
     }
 
     function setSync(on) {
       transcriptSyncOn = !!on;
-      setButtons(transcriptSyncOn);
+      setToggleUi(transcriptSyncOn);
       if (transcriptSyncOn) {
         transcriptSyncLastId = null;
         ensurePlayer();
+        // Turning Sync on always snaps once to the current timemark.
+        tick({ force: true, forceSnap: true });
         startLoop();
       } else {
         stopLoop();
+        closeAllMenus();
       }
     }
 
-    buttons.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        setSync(!transcriptSyncOn);
+    function setMode(mode) {
+      if (mode !== 'none' && mode !== 'ease' && mode !== 'continuous') mode = 'ease';
+      setModeUi(mode);
+      closeAllMenus();
+      if (transcriptSyncOn) {
+        // Re-apply immediately with new mode; snap once when switching into ease/continuous.
+        transcriptSyncLastId = null;
+        tick({ force: true, forceSnap: mode !== 'none' });
+        startLoop();
+      }
+    }
+
+    controls.forEach(function (control) {
+      const toggle = control.querySelector('.js-transcript-sync');
+      const modeBtn = control.querySelector('.js-transcript-sync-mode-btn');
+      const menu = control.querySelector('.transcript-sync-menu');
+      if (toggle) {
+        toggle.addEventListener('click', function (e) {
+          e.preventDefault();
+          setSync(!transcriptSyncOn);
+        });
+      }
+      if (modeBtn && menu) {
+        modeBtn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const open = menu.hidden;
+          closeAllMenus();
+          if (open) {
+            menu.hidden = false;
+            modeBtn.setAttribute('aria-expanded', 'true');
+          }
+        });
+      }
+      control.querySelectorAll('.transcript-sync-mode-option').forEach(function (opt) {
+        opt.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          setMode(opt.getAttribute('data-sync-mode') || 'ease');
+        });
       });
+    });
+
+    document.addEventListener('click', function () {
+      closeAllMenus();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeAllMenus();
     });
 
     transcriptSyncListeners.push(function (state) {
       if (!transcriptSyncOn) return;
-      // YT.PlayerState.PLAYING === 1
       if (state === 1 || state === 'ready') startLoop();
-      else if (state === 2 || state === 0) {
-        // paused / ended: one last tick, keep interval so scrubbing still updates lightly
-        tick();
-      }
+      else if (state === 2 || state === 0) tick();
     });
 
-    setButtons(false);
+    setToggleUi(false);
+    setModeUi('ease');
   }
 
   document.addEventListener('DOMContentLoaded', () => {
