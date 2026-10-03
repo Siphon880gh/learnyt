@@ -1,354 +1,979 @@
 {
   "video": {
     "id": "sample-spaced-rep",
-    "title": "Spaced Repetition Explained: Remember More with Less Cramming",
-    "channel": "Learnyt Sample Lectures",
-    "duration": 290,
+    "embedId": "aircAruvnKk",
+    "title": "But what is a neural network? | Deep learning chapter 1",
+    "channel": "3Blue1Brown",
+    "duration": 1120,
     "thumbnail": "https://img.youtube.com/vi/aircAruvnKk/hqdefault.jpg",
     "url": "https://www.youtube.com/watch?v=aircAruvnKk",
-    "note": "Sample lesson: transcript/TOCs are synthetic educational content about spaced repetition. embedId points at a public YouTube video so the iframe demo works; it is not a transcript of that video.",
-    "embedId": "aircAruvnKk"
+    "note": "Seed lesson id remains sample-spaced-rep for stable deep links; transcript/TOCs/diagrams match the embedded YouTube video aircAruvnKk."
   },
   "meta": {
     "createdAt": "2026-10-02T00:00:00Z",
-    "updatedAt": "2026-10-02T21:37:09Z",
-    "generator": "sample",
-    "summary": "A concise introduction to spaced repetition: forgetting curves, SM-2 style scheduling, retrieval practice, common mistakes, and how to start with atomic cards.",
+    "updatedAt": "2026-10-03T07:07:39Z",
+    "generator": "youtube-lesson-skill",
+    "transcriptConfidence": "high",
+    "summary": "3Blue1Brown introduces neural networks through handwritten digit recognition: what neurons and layers are, why stacking layers helps build hierarchical features, how weights and biases work, and how this picture connects to learning and linear algebra.",
     "learningObjectives": [
-      "Explain the forgetting curve and why spacing helps",
-      "Describe how SM-2 adjusts interval and ease from ratings",
-      "Identify card design mistakes that break SRS",
-      "Apply spaced review to a domain beyond language learning"
+      "Explain what a neuron computes (weighted sum, bias, activation)",
+      "Describe input, hidden, and output layers for digit recognition",
+      "Give an intuition for why multiple layers capture hierarchical features",
+      "Relate weights/biases to the number of parameters in a network"
     ]
   },
   "transcript": [
     {
       "id": "s1",
-      "start": 0.0,
-      "end": 12.0,
-      "text": "Welcome. Today we are going to unpack spaced repetition—the idea that reviewing material at expanding intervals makes memories stick far better than cramming."
+      "start": 4.22,
+      "end": 5.4,
+      "text": "This is a 3."
     },
     {
       "id": "s2",
-      "start": 12.0,
-      "end": 28.0,
-      "text": "First, a quick prerequisite: memory is not a single store. Psychologists distinguish sensory memory, working memory, and long-term memory. Spaced repetition mainly trains the path into long-term memory."
+      "start": 6.06,
+      "end": 13.72,
+      "text": "It's sloppily written and rendered at an extremely low resolution of 28x28 pixels, but your brain has no trouble recognizing it as a 3."
     },
     {
       "id": "s3",
-      "start": 28.0,
-      "end": 45.0,
-      "text": "The forgetting curve, popularized by Ebbinghaus in the late nineteenth century, shows that recall drops quickly after learning unless we reinforce it. The good news: each successful recall flattens that curve."
+      "start": 14.34,
+      "end": 18.96,
+      "text": "And I want you to take a moment to appreciate how crazy it is that brains can do this so effortlessly."
     },
     {
       "id": "s4",
-      "start": 45.0,
-      "end": 62.0,
-      "text": "Definition: spaced repetition is a scheduling technique that presents an item for review just as you are about to forget it—often using an algorithm such as SM-2."
+      "start": 19.7,
+      "end": 28.32,
+      "text": "I mean, this, this and this are also recognizable as 3s, even though the specific values of each pixel is very different from one image to the next."
     },
     {
       "id": "s5",
-      "start": 62.0,
-      "end": 80.0,
-      "text": "SM-2, originally from SuperMemo, tracks an ease factor and an interval. After you rate a card Again, Hard, Good, or Easy, the algorithm adjusts when you will see it next."
+      "start": 28.9,
+      "end": 36.94,
+      "text": "The particular light-sensitive cells in your eye that are firing when you see this 3 are very different from the ones firing when you see this 3."
     },
     {
       "id": "s6",
-      "start": 80.0,
-      "end": 98.0,
-      "text": "Core mechanism: retrieval practice. The act of recalling, not re-reading, strengthens the memory trace. Spacing adds difficulty in a productive way—desirable difficulty."
+      "start": 37.52,
+      "end": 48.34,
+      "text": "But something in that crazy-smart visual cortex of yours resolves these as representing the same idea, while at the same time recognizing other images as their own distinct ideas."
     },
     {
       "id": "s7",
-      "start": 98.0,
-      "end": 115.0,
-      "text": "Example: imagine learning the Spanish word for apple. Day zero you learn it. Day one you recall it. Three days later you recall again. Then a week, then a month. Failures reset or shorten the interval."
+      "start": 49.22,
+      "end": 59.135,
+      "text": "But if I told you, hey, sit down and write for me a program that takes in a grid of 28x28 pixels like this and outputs a single number between 0 and 10,"
     },
     {
       "id": "s8",
-      "start": 115.0,
-      "end": 135.0,
-      "text": "A common mistake is making cards too broad. If a card asks for an entire essay, grading becomes noisy and the schedule cannot target the weak part. Prefer atomic facts or clear prompts."
+      "start": 59.135,
+      "end": 66.18,
+      "text": "telling you what it thinks the digit is, well the task goes from comically trivial to dauntingly difficult."
     },
     {
       "id": "s9",
-      "start": 135.0,
-      "end": 155.0,
-      "text": "Another mistake: passive highlighting without retrieval. Highlighting feels productive but does little unless you later force yourself to recall from cues."
+      "start": 67.16,
+      "end": 74.64,
+      "text": "Unless you've been living under a rock, I think I hardly need to motivate the relevance and importance of machine learning and neural networks to the present and to the future."
     },
     {
       "id": "s10",
-      "start": 155.0,
-      "end": 175.0,
-      "text": "Applications go beyond language decks. Engineers use spaced review for APIs and incident playbooks. Medical students use it for anatomy. Musicians space practice of difficult passages."
+      "start": 75.12,
+      "end": 84.46,
+      "text": "But what I want to do here is show you what a neural network actually is, assuming no background, and to help visualize what it's doing, not as a buzzword but as a piece of math."
     },
     {
       "id": "s11",
-      "start": 175.0,
-      "end": 195.0,
-      "text": "Argument: massed practice can produce short-term performance gains that fool you into thinking you have mastered the material. Spaced practice often looks worse in the moment but wins on delayed tests."
+      "start": 85.02,
+      "end": 94.34,
+      "text": "My hope is that you come away feeling like the structure itself is motivated, and to feel like you know what it means when you read, or you hear about a neural network quote-unquote learning."
     },
     {
       "id": "s12",
-      "start": 195.0,
-      "end": 215.0,
-      "text": "How to start: pick a tool—Anki, a simple JSON store like Learnyt, or paper flashcards. Capture one clear question and answer per card. Review daily, even for ten minutes."
+      "start": 95.36,
+      "end": 100.26,
+      "text": "This video is just going to be devoted to the structure component of that, and the following one is going to tackle learning."
     },
     {
       "id": "s13",
-      "start": 215.0,
-      "end": 235.0,
-      "text": "When rating, be honest. If you barely recalled with hints, choose Hard or Again. Inflating Good ratings produces a pile of overdue cards later."
+      "start": 100.96,
+      "end": 106.04,
+      "text": "What we're going to do is put together a neural network that can learn to recognize handwritten digits."
     },
     {
       "id": "s14",
-      "start": 235.0,
-      "end": 255.0,
-      "text": "Takeaway one: memory is a skill of scheduling as much as of studying. Takeaway two: retrieval plus spacing beats rereading. Takeaway three: keep cards small and source-linked so you can jump back to context."
+      "start": 109.36,
+      "end": 117.503,
+      "text": "This is a somewhat classic example for introducing the topic, and I'm happy to stick with the status quo here, because at the end of the two videos I want to point you to a couple good"
     },
     {
       "id": "s15",
-      "start": 255.0,
-      "end": 275.0,
-      "text": "If you remember only one phrase from this talk, let it be desirable difficulty: the slight struggle of recalling at the right time is the feature, not the bug."
+      "start": 117.503,
+      "end": 123.08,
+      "text": "resources where you can learn more, and where you can download the code that does this and play with it on your own computer."
     },
     {
       "id": "s16",
-      "start": 275.0,
-      "end": 290.0,
-      "text": "Thanks for watching. Try saving a few highlights from a real lecture into spaced repetition and rate them honestly for a week—you will feel the difference."
+      "start": 125.04,
+      "end": 136.942,
+      "text": "There are many many variants of neural networks, and in recent years there's been sort of a boom in research towards these variants, but in these two introductory videos you and I are just going to look at the simplest"
+    },
+    {
+      "id": "s17",
+      "start": 136.942,
+      "end": 139.18,
+      "text": "plain vanilla form with no added frills."
+    },
+    {
+      "id": "s18",
+      "start": 139.86,
+      "end": 148.712,
+      "text": "This is kind of a necessary prerequisite for understanding any of the more powerful modern variants, and trust me it still has plenty of complexity for us to wrap our minds around."
+    },
+    {
+      "id": "s19",
+      "start": 149.12,
+      "end": 156.52,
+      "text": "But even in this simplest form it can learn to recognize handwritten digits, which is a pretty cool thing for a computer to be able to do."
+    },
+    {
+      "id": "s20",
+      "start": 157.48,
+      "end": 162.28,
+      "text": "And at the same time you'll see how it does fall short of a couple hopes that we might have for it."
+    },
+    {
+      "id": "s21",
+      "start": 163.38,
+      "end": 171.66,
+      "text": "As the name suggests neural networks are inspired by the brain, but let's break that down. What are the neurons, and in what sense are they linked together?"
+    },
+    {
+      "id": "s22",
+      "start": 172.5,
+      "end": 182.56,
+      "text": "Right now when I say neuron all I want you to think about is a thing that holds a number, specifically a number between 0 and 1. It's really not more than that."
+    },
+    {
+      "id": "s23",
+      "start": 183.78,
+      "end": 194.22,
+      "text": "For example the network starts with a bunch of neurons corresponding to each of the 28x28 pixels of the input image, which is 784 neurons in total."
+    },
+    {
+      "id": "s24",
+      "start": 194.7,
+      "end": 204.38,
+      "text": "Each one of these holds a number that represents the grayscale value of the corresponding pixel, ranging from 0 for black pixels up to 1 for white pixels."
+    },
+    {
+      "id": "s25",
+      "start": 205.3,
+      "end": 214.16,
+      "text": "This number inside the neuron is called its activation, and the image you might have in mind here is that each neuron is lit up when its activation is a high number."
+    },
+    {
+      "id": "s26",
+      "start": 216.72,
+      "end": 221.86,
+      "text": "So all of these 784 neurons make up the first layer of our network."
+    },
+    {
+      "id": "s27",
+      "start": 226.5,
+      "end": 231.36,
+      "text": "Now jumping over to the last layer, this has 10 neurons, each representing one of the digits."
+    },
+    {
+      "id": "s28",
+      "start": 232.04,
+      "end": 242.12,
+      "text": "The activation in these neurons, again some number that's between 0 and 1, represents how much the system thinks that a given image corresponds with a given digit."
+    },
+    {
+      "id": "s29",
+      "start": 243.04,
+      "end": 253.6,
+      "text": "There's also a couple layers in between called the hidden layers, which for the time being should just be a giant question mark for how on earth this process of recognizing digits is going to be handled."
+    },
+    {
+      "id": "s30",
+      "start": 254.26,
+      "end": 264.655,
+      "text": "In this network I chose two hidden layers, each one with 16 neurons, and admittedly that's kind of an arbitrary choice. To be honest I chose two layers based on how I want to motivate the structure in"
+    },
+    {
+      "id": "s31",
+      "start": 264.655,
+      "end": 272.34,
+      "text": "just a moment, and 16, well that was just a nice number to fit on the screen. In practice there is a lot of room for experiment with a specific structure here."
+    },
+    {
+      "id": "s32",
+      "start": 273.02,
+      "end": 278.48,
+      "text": "The way the network operates, activations in one layer determine the activations of the next layer."
+    },
+    {
+      "id": "s33",
+      "start": 279.2,
+      "end": 288.713,
+      "text": "And of course the heart of the network as an information processing mechanism comes down to exactly how those activations from one layer bring about activations in the next layer."
+    },
+    {
+      "id": "s34",
+      "start": 289.14,
+      "end": 297.18,
+      "text": "It's meant to be loosely analogous to how in biological networks of neurons, some groups of neurons firing cause certain others to fire."
+    },
+    {
+      "id": "s35",
+      "start": 298.12,
+      "end": 308.294,
+      "text": "Now the network I'm showing here has already been trained to recognize digits, and let me show you what I mean by that. It means if you feed in an image, lighting up all 784 neurons of the input layer"
+    },
+    {
+      "id": "s36",
+      "start": 308.294,
+      "end": 318.939,
+      "text": "according to the brightness of each pixel in the image, that pattern of activations causes some very specific pattern in the next layer which causes some pattern in the one after it,"
+    },
+    {
+      "id": "s37",
+      "start": 318.939,
+      "end": 329.4,
+      "text": "which finally gives some pattern in the output layer. And the brightest neuron of that output layer is the network's choice, so to speak, for what digit this image represents."
+    },
+    {
+      "id": "s38",
+      "start": 332.56,
+      "end": 343.52,
+      "text": "And before jumping into the math for how one layer influences the next, or how training works, let's just talk about why it's even reasonable to expect a layered structure like this to behave intelligently."
+    },
+    {
+      "id": "s39",
+      "start": 344.06,
+      "end": 347.6,
+      "text": "What are we expecting here? What is the best hope for what those middle layers might be doing?"
+    },
+    {
+      "id": "s40",
+      "start": 348.92,
+      "end": 353.52,
+      "text": "Well, when you or I recognize digits, we piece together various components."
+    },
+    {
+      "id": "s41",
+      "start": 354.2,
+      "end": 361.18,
+      "text": "A 9 has a loop up top and a line on the right. An 8 also has a loop up top, but it's paired with another loop down low."
+    },
+    {
+      "id": "s42",
+      "start": 361.98,
+      "end": 366.82,
+      "text": "A 4 basically breaks down into three specific lines, and things like that."
+    },
+    {
+      "id": "s43",
+      "start": 367.6,
+      "end": 378.484,
+      "text": "Now in a perfect world, we might hope that each neuron in the second to last layer corresponds with one of these subcomponents, that anytime you feed in an image with, say, a loop up top,"
+    },
+    {
+      "id": "s44",
+      "start": 378.484,
+      "end": 383.78,
+      "text": "like a 9 or an 8, there's some specific neuron whose activation is going to be close to 1."
+    },
+    {
+      "id": "s45",
+      "start": 384.5,
+      "end": 391.56,
+      "text": "And I don't mean this specific loop of pixels, the hope would be that any generally loopy pattern towards the top sets off this neuron."
+    },
+    {
+      "id": "s46",
+      "start": 392.44,
+      "end": 400.04,
+      "text": "That way, going from the third layer to the last one just requires learning which combination of subcomponents corresponds to which digits."
+    },
+    {
+      "id": "s47",
+      "start": 401.0,
+      "end": 407.64,
+      "text": "Of course, that just kicks the problem down the road, because how would you recognize these subcomponents, or even learn what the right subcomponents should be?"
+    },
+    {
+      "id": "s48",
+      "start": 408.06,
+      "end": 413.06,
+      "text": "And I still haven't even talked about how one layer influences the next, but run with me on this one for a moment."
+    },
+    {
+      "id": "s49",
+      "start": 413.68,
+      "end": 422.78,
+      "text": "Recognizing a loop can also break down into subproblems. One reasonable way to do this would be to first recognize the various little edges that make it up."
+    },
+    {
+      "id": "s50",
+      "start": 423.78,
+      "end": 434.32,
+      "text": "Similarly, a long line, like the kind you might see in the digits 1 or 4 or 7, is really just a long edge, or maybe you think of it as a certain pattern of several smaller edges."
+    },
+    {
+      "id": "s51",
+      "start": 435.14,
+      "end": 442.72,
+      "text": "So maybe our hope is that each neuron in the second layer of the network corresponds with the various relevant little edges."
+    },
+    {
+      "id": "s52",
+      "start": 443.54,
+      "end": 455.156,
+      "text": "Maybe when an image like this one comes in, it lights up all of the neurons associated with around 8 to 10 specific little edges, which in turn lights up the neurons associated with the upper loop"
+    },
+    {
+      "id": "s53",
+      "start": 455.156,
+      "end": 459.72,
+      "text": "and a long vertical line, and those light up the neuron associated with a 9."
+    },
+    {
+      "id": "s54",
+      "start": 460.68,
+      "end": 467.936,
+      "text": "Whether or not this is what our final network actually does is another question, one that I'll come back to once we see how to train the network,"
+    },
+    {
+      "id": "s55",
+      "start": 467.936,
+      "end": 472.54,
+      "text": "but this is a hope that we might have, a sort of goal with the layered structure like this."
+    },
+    {
+      "id": "s56",
+      "start": 473.16,
+      "end": 484.012,
+      "text": "Moreover, you can imagine how being able to detect edges and patterns like this would be really useful for other image recognition tasks. And even beyond image recognition, there are all sorts of intelligent"
+    },
+    {
+      "id": "s57",
+      "start": 484.012,
+      "end": 487.28,
+      "text": "things you might want to do that break down into layers of abstraction."
+    },
+    {
+      "id": "s58",
+      "start": 488.04,
+      "end": 496.503,
+      "text": "Parsing speech, for example, involves taking raw audio and picking out distinct sounds, which combine to make certain syllables, which combine to form words,"
+    },
+    {
+      "id": "s59",
+      "start": 496.503,
+      "end": 500.06,
+      "text": "which combine to make up phrases and more abstract thoughts, etc."
+    },
+    {
+      "id": "s60",
+      "start": 501.1,
+      "end": 509.92,
+      "text": "But getting back to how any of this actually works, picture yourself right now designing how exactly the activations in one layer might determine the activations in the next."
+    },
+    {
+      "id": "s61",
+      "start": 510.86,
+      "end": 523.268,
+      "text": "The goal is to have some mechanism that could conceivably combine pixels into edges, or edges into patterns, or patterns into digits. And to zoom in on one very specific example, let's say the hope"
+    },
+    {
+      "id": "s62",
+      "start": 523.268,
+      "end": 530.62,
+      "text": "is for one particular neuron in the second layer to pick up on whether or not the image has an edge in this region here."
+    },
+    {
+      "id": "s63",
+      "start": 531.44,
+      "end": 543.659,
+      "text": "The question at hand is what parameters should the network have? What dials and knobs should you be able to tweak so that it's expressive enough to potentially capture this pattern, or any other pixel pattern,"
+    },
+    {
+      "id": "s64",
+      "start": 543.659,
+      "end": 547.78,
+      "text": "or the pattern that several edges can make a loop, and other such things?"
+    },
+    {
+      "id": "s65",
+      "start": 548.72,
+      "end": 555.56,
+      "text": "Well, what we'll do is assign a weight to each one of the connections between our neuron and the neurons from the first layer."
+    },
+    {
+      "id": "s66",
+      "start": 556.32,
+      "end": 557.7,
+      "text": "These weights are just numbers."
+    },
+    {
+      "id": "s67",
+      "start": 558.54,
+      "end": 565.5,
+      "text": "Then take all of those activations from the first layer and compute their weighted sum according to these weights."
+    },
+    {
+      "id": "s68",
+      "start": 567.7,
+      "end": 577.743,
+      "text": "I find it helpful to think of these weights as being organized into a little grid of their own, and I'm going to use green pixels to indicate positive weights, and red pixels to indicate negative weights,"
+    },
+    {
+      "id": "s69",
+      "start": 577.743,
+      "end": 581.78,
+      "text": "where the brightness of that pixel is some loose depiction of the weight's value."
+    },
+    {
+      "id": "s70",
+      "start": 582.78,
+      "end": 593.865,
+      "text": "Now if we made the weights associated with almost all of the pixels zero except for some positive weights in this region that we care about, then taking the weighted sum of all the pixel values really just amounts"
+    },
+    {
+      "id": "s71",
+      "start": 593.865,
+      "end": 597.82,
+      "text": "to adding up the values of the pixel just in the region that we care about."
+    },
+    {
+      "id": "s72",
+      "start": 599.14,
+      "end": 606.6,
+      "text": "And if you really wanted to pick up on whether there's an edge here, what you might do is have some negative weights associated with the surrounding pixels."
+    },
+    {
+      "id": "s73",
+      "start": 607.48,
+      "end": 612.7,
+      "text": "Then the sum is largest when those middle pixels are bright but the surrounding pixels are darker."
+    },
+    {
+      "id": "s74",
+      "start": 614.26,
+      "end": 623.54,
+      "text": "When you compute a weighted sum like this, you might come out with any number, but for this network what we want is for activations to be some value between 0 and 1."
+    },
+    {
+      "id": "s75",
+      "start": 624.12,
+      "end": 635.833,
+      "text": "So a common thing to do is to pump this weighted sum into some function that squishes the real number line into the range between 0 and 1. And a common function that does this is called the sigmoid function,"
+    },
+    {
+      "id": "s76",
+      "start": 635.833,
+      "end": 646.6,
+      "text": "also known as a logistic curve. Basically very negative inputs end up close to 0, positive inputs end up close to 1, and it just steadily increases around the input 0."
+    },
+    {
+      "id": "s77",
+      "start": 649.12,
+      "end": 656.36,
+      "text": "So the activation of the neuron here is basically a measure of how positive the relevant weighted sum is."
+    },
+    {
+      "id": "s78",
+      "start": 657.54,
+      "end": 670.26,
+      "text": "But maybe it's not that you want the neuron to light up when the weighted sum is bigger than 0. Maybe you only want it to be active when the sum is bigger than say 10. That is, you want some bias for it to be inactive."
+    },
+    {
+      "id": "s79",
+      "start": 671.38,
+      "end": 679.66,
+      "text": "What we'll do then is just add in some other number like negative 10 to this weighted sum before plugging it through the sigmoid squishification function."
+    },
+    {
+      "id": "s80",
+      "start": 680.58,
+      "end": 682.44,
+      "text": "That additional number is called the bias."
+    },
+    {
+      "id": "s81",
+      "start": 683.46,
+      "end": 695.18,
+      "text": "So the weights tell you what pixel pattern this neuron in the second layer is picking up on, and the bias tells you how high the weighted sum needs to be before the neuron starts getting meaningfully active."
+    },
+    {
+      "id": "s82",
+      "start": 696.12,
+      "end": 697.68,
+      "text": "And that is just one neuron."
+    },
+    {
+      "id": "s83",
+      "start": 698.28,
+      "end": 710.94,
+      "text": "Every other neuron in this layer is going to be connected to all 784 pixel neurons from the first layer, and each one of those 784 connections has its own weight associated with it."
+    },
+    {
+      "id": "s84",
+      "start": 711.6,
+      "end": 719.54,
+      "text": "Also, each one has some bias, some other number that you add on to the weighted sum before squishing it with the sigmoid. And that's a lot to think about!"
+    },
+    {
+      "id": "s85",
+      "start": 719.96,
+      "end": 727.98,
+      "text": "With this hidden layer of 16 neurons, that's a total of 784 times 16 weights, along with 16 biases."
+    },
+    {
+      "id": "s86",
+      "start": 728.84,
+      "end": 737.34,
+      "text": "And all of that is just the connections from the first layer to the second. The connections between the other layers also have a bunch of weights and biases associated with them."
+    },
+    {
+      "id": "s87",
+      "start": 738.34,
+      "end": 749.96,
+      "text": "All said and done, this network has almost exactly 13,000 total weights and biases. 13,000 knobs and dials that can be tweaked and turned to make this network behave in different ways."
+    },
+    {
+      "id": "s88",
+      "start": 751.04,
+      "end": 761.36,
+      "text": "So when we talk about learning, what that's referring to is getting the computer to find a valid setting for all of these many many numbers so that it'll actually solve the problem at hand."
+    },
+    {
+      "id": "s89",
+      "start": 762.62,
+      "end": 770.23,
+      "text": "One thought experiment that is at once fun and kind of horrifying is to imagine sitting down and setting all of these weights and biases by hand,"
+    },
+    {
+      "id": "s90",
+      "start": 770.23,
+      "end": 781.342,
+      "text": "purposefully tweaking the numbers so that the second layer picks up on edges, the third layer picks up on patterns, etc. I personally find this satisfying rather than just treating the network as a total black"
+    },
+    {
+      "id": "s91",
+      "start": 781.342,
+      "end": 789.025,
+      "text": "box, because when the network doesn't perform the way you anticipate, if you've built up a little bit of a relationship with what those weights and biases"
+    },
+    {
+      "id": "s92",
+      "start": 789.025,
+      "end": 794.18,
+      "text": "actually mean, you have a starting place for experimenting with how to change the structure to improve."
+    },
+    {
+      "id": "s93",
+      "start": 794.96,
+      "end": 802.249,
+      "text": "Or when the network does work but not for the reasons you might expect, digging into what the weights and biases are doing is a good way to challenge"
+    },
+    {
+      "id": "s94",
+      "start": 802.249,
+      "end": 805.82,
+      "text": "your assumptions and really expose the full space of possible solutions."
+    },
+    {
+      "id": "s95",
+      "start": 806.84,
+      "end": 810.68,
+      "text": "By the way, the actual function here is a little cumbersome to write down, don't you think?"
+    },
+    {
+      "id": "s96",
+      "start": 812.5,
+      "end": 820.52,
+      "text": "So let me show you a more notationally compact way that these connections are represented. This is how you'd see it if you choose to read up more about neural networks."
+    },
+    {
+      "id": "s97",
+      "start": 820.52,
+      "end": 830.038,
+      "text": "Organize all of the activations from one layer into a column as a vector. Then organize all of the weights as a matrix, where each row of that matrix corresponds"
+    },
+    {
+      "id": "s98",
+      "start": 830.038,
+      "end": 845.887,
+      "text": "to the connections between one layer and a particular neuron in the next layer. What that means is that taking the weighted sum of the activations in the first layer according to these weights corresponds to one of the"
+    },
+    {
+      "id": "s99",
+      "start": 845.887,
+      "end": 849.88,
+      "text": "terms in the matrix vector product of everything we have on the left here."
+    },
+    {
+      "id": "s100",
+      "start": 854.0,
+      "end": 864.834,
+      "text": "By the way, so much of machine learning just comes down to having a good grasp of linear algebra, so for any of you who want a nice visual understanding for matrices and what matrix vector multiplication means,"
+    },
+    {
+      "id": "s101",
+      "start": 864.834,
+      "end": 868.6,
+      "text": "take a look at the series I did on linear algebra, especially chapter 3."
+    },
+    {
+      "id": "s102",
+      "start": 869.24,
+      "end": 878.002,
+      "text": "Back to our expression, instead of talking about adding the bias to each one of these values independently, we represent it by organizing all those biases into"
+    },
+    {
+      "id": "s103",
+      "start": 878.002,
+      "end": 882.3,
+      "text": "a vector, and adding the entire vector to the previous matrix vector product."
+    },
+    {
+      "id": "s104",
+      "start": 883.28,
+      "end": 894.74,
+      "text": "Then as a final step, I'll wrap a sigmoid around the outside here, and what that's supposed to represent is that you're going to apply the sigmoid function to each specific component of the resulting vector inside."
+    },
+    {
+      "id": "s105",
+      "start": 895.94,
+      "end": 905.408,
+      "text": "So once you write down this weight matrix and these vectors as their own symbols, you can communicate the full transition of activations from one layer to the next in an"
+    },
+    {
+      "id": "s106",
+      "start": 905.408,
+      "end": 915.66,
+      "text": "extremely tight and neat little expression, and this makes the relevant code both a lot simpler and a lot faster, since many libraries optimize the heck out of matrix multiplication."
+    },
+    {
+      "id": "s107",
+      "start": 917.82,
+      "end": 921.46,
+      "text": "Remember how earlier I said these neurons are simply things that hold numbers?"
+    },
+    {
+      "id": "s108",
+      "start": 922.22,
+      "end": 931.588,
+      "text": "Well of course the specific numbers that they hold depends on the image you feed in, so it's actually more accurate to think of each neuron as a function,"
+    },
+    {
+      "id": "s109",
+      "start": 931.588,
+      "end": 938.34,
+      "text": "one that takes in the outputs of all the neurons in the previous layer and spits out a number between 0 and 1."
+    },
+    {
+      "id": "s110",
+      "start": 939.2,
+      "end": 951.462,
+      "text": "Really the entire network is just a function, one that takes in 784 numbers as an input and spits out 10 numbers as an output. It's an absurdly complicated function, one that involves 13,000 parameters"
+    },
+    {
+      "id": "s111",
+      "start": 951.462,
+      "end": 962.64,
+      "text": "in the forms of these weights and biases that pick up on certain patterns, and which involves iterating many matrix vector products and the sigmoid squishification function, but it's just a function nonetheless."
+    },
+    {
+      "id": "s112",
+      "start": 963.4,
+      "end": 966.66,
+      "text": "And in a way it's kind of reassuring that it looks complicated."
+    },
+    {
+      "id": "s113",
+      "start": 967.34,
+      "end": 972.28,
+      "text": "I mean if it were any simpler, what hope would we have that it could take on the challenge of recognizing digits?"
+    },
+    {
+      "id": "s114",
+      "start": 973.34,
+      "end": 979.36,
+      "text": "And how does it take on that challenge? How does this network learn the appropriate weights and biases just by looking at data?"
+    },
+    {
+      "id": "s115",
+      "start": 980.14,
+      "end": 986.12,
+      "text": "Well that's what I'll show in the next video, and I'll also dig a little more into what this particular network we're seeing is really doing."
+    },
+    {
+      "id": "s116",
+      "start": 987.58,
+      "end": 997.42,
+      "text": "Now is the point I suppose I should say subscribe to stay notified about when that video or any new videos come out, but realistically most of you don't actually receive notifications from YouTube, do you?"
+    },
+    {
+      "id": "s117",
+      "start": 998.02,
+      "end": 1007.88,
+      "text": "Maybe more honestly I should say subscribe so that the neural networks that underlie YouTube's recommendation algorithm are primed to believe that you want to see content from this channel get recommended to you."
+    },
+    {
+      "id": "s118",
+      "start": 1008.56,
+      "end": 1009.94,
+      "text": "Anyway, stay posted for more."
+    },
+    {
+      "id": "s119",
+      "start": 1010.76,
+      "end": 1019.716,
+      "text": "Thank you very much to everyone supporting these videos on Patreon. I've been a little slow to progress in the probability series this summer, but I'm jumping back into it after this project,"
+    },
+    {
+      "id": "s120",
+      "start": 1019.716,
+      "end": 1021.9,
+      "text": "so patrons you can look out for updates there."
+    },
+    {
+      "id": "s121",
+      "start": 1023.6,
+      "end": 1030.717,
+      "text": "To close things off here I have with me Lisha Li who did her PhD work on the theoretical side of deep learning and who currently works at a venture capital"
+    },
+    {
+      "id": "s122",
+      "start": 1030.717,
+      "end": 1034.62,
+      "text": "firm called Amplify Partners who kindly provided some of the funding for this video."
+    },
+    {
+      "id": "s123",
+      "start": 1035.46,
+      "end": 1043.158,
+      "text": "So Lisha one thing I think we should quickly bring up is this sigmoid function. As I understand it early networks use this to squish the relevant weighted"
+    },
+    {
+      "id": "s124",
+      "start": 1043.158,
+      "end": 1054.04,
+      "text": "sum into that interval between zero and one, you know kind of motivated by this biological analogy of neurons either being inactive or active. Exactly. But relatively few modern networks actually use sigmoid anymore."
+    },
+    {
+      "id": "s125",
+      "start": 1054.32,
+      "end": 1067.401,
+      "text": "Yeah. It's kind of old school right? Yeah or rather ReLU seems to be much easier to train. And ReLU, ReLU stands for rectified linear unit? Yes it's this kind of function where you're just taking a max of zero"
+    },
+    {
+      "id": "s126",
+      "start": 1067.401,
+      "end": 1081.36,
+      "text": "and a where a is given by what you were explaining in the video and what this was sort of motivated from I think was a partially by a biological analogy with how neurons would either be activated or not."
+    },
+    {
+      "id": "s127",
+      "start": 1081.36,
+      "end": 1090.84,
+      "text": "And so if it passes a certain threshold it would be the identity function but if it did not then it would just not be activated so it'd be zero so it's kind of a simplification."
+    },
+    {
+      "id": "s128",
+      "start": 1091.16,
+      "end": 1105.64,
+      "text": "Using sigmoids didn't help training or it was very difficult to train at some point and people just tried ReLU and it happened to work very well for these incredibly deep neural networks. All right thank you Lisha."
     }
   ],
   "chronologicalToc": [
     {
       "id": "c1",
-      "title": "Welcome & agenda",
-      "start": 0,
-      "end": 12
+      "title": "Introduction example",
+      "start": 0.0,
+      "end": 67.0
     },
     {
       "id": "c2",
-      "title": "Memory systems primer",
-      "start": 12,
-      "end": 28
+      "title": "Series preview",
+      "start": 67.0,
+      "end": 162.0
     },
     {
       "id": "c3",
-      "title": "The forgetting curve",
-      "start": 28,
-      "end": 45
+      "title": "What are neurons?",
+      "start": 162.0,
+      "end": 215.0
     },
     {
       "id": "c4",
-      "title": "Defining spaced repetition",
-      "start": 45,
-      "end": 62
+      "title": "Introducing layers",
+      "start": 215.0,
+      "end": 331.0
     },
     {
       "id": "c5",
-      "title": "SM-2 algorithm sketch",
-      "start": 62,
-      "end": 80
+      "title": "Why layers?",
+      "start": 331.0,
+      "end": 518.0
     },
     {
       "id": "c6",
-      "title": "Retrieval practice & desirable difficulty",
-      "start": 80,
-      "end": 98
+      "title": "Edge detection example",
+      "start": 518.0,
+      "end": 694.0
     },
     {
       "id": "c7",
-      "title": "Worked example: vocabulary",
-      "start": 98,
-      "end": 115
+      "title": "Counting weights and biases",
+      "start": 694.0,
+      "end": 750.0
     },
     {
       "id": "c8",
-      "title": "Common mistakes",
-      "start": 115,
-      "end": 155
+      "title": "How learning relates",
+      "start": 750.0,
+      "end": 806.0
     },
     {
       "id": "c9",
-      "title": "Applications beyond language",
-      "start": 155,
-      "end": 175
+      "title": "Notation and linear algebra",
+      "start": 806.0,
+      "end": 917.0
     },
     {
       "id": "c10",
-      "title": "Massed vs spaced argument",
-      "start": 175,
-      "end": 195
+      "title": "Recap",
+      "start": 917.0,
+      "end": 987.0
     },
     {
       "id": "c11",
-      "title": "Getting started & honest ratings",
-      "start": 195,
-      "end": 235
+      "title": "Some final words",
+      "start": 987.0,
+      "end": 1023.0
     },
     {
       "id": "c12",
-      "title": "Takeaways & close",
-      "start": 235,
-      "end": 290
+      "title": "ReLU vs Sigmoid",
+      "start": 1023.0,
+      "end": 1120.0
     }
   ],
   "learningToc": [
     {
       "id": "l1",
-      "title": "Sensory, working, and long-term memory",
-      "category": "prerequisite",
+      "title": "Handwritten digit recognition as the motivating example",
+      "category": "example",
       "sources": [
         {
-          "start": 12,
-          "end": 28
+          "start": 0,
+          "end": 67
         }
       ]
     },
     {
       "id": "l2",
-      "title": "Ebbinghaus forgetting curve",
-      "category": "concept",
-      "sources": [
-        {
-          "start": 28,
-          "end": 45
-        }
-      ]
-    },
-    {
-      "id": "l3",
-      "title": "Spaced repetition defined",
+      "title": "What a neuron represents",
       "category": "definition",
       "sources": [
         {
-          "start": 45,
-          "end": 62
-        }
-      ]
-    },
-    {
-      "id": "l4",
-      "title": "SM-2 ease factor and intervals",
-      "category": "mechanism",
-      "sources": [
-        {
-          "start": 62,
-          "end": 80
-        }
-      ]
-    },
-    {
-      "id": "l5",
-      "title": "Retrieval practice strengthens memory",
-      "category": "mechanism",
-      "sources": [
-        {
-          "start": 80,
-          "end": 98
-        }
-      ]
-    },
-    {
-      "id": "l6",
-      "title": "Desirable difficulty",
-      "category": "concept",
-      "sources": [
-        {
-          "start": 80,
-          "end": 98
-        },
-        {
-          "start": 255,
-          "end": 275
-        }
-      ]
-    },
-    {
-      "id": "l7",
-      "title": "Spanish vocabulary spacing schedule",
-      "category": "example",
-      "sources": [
-        {
-          "start": 98,
-          "end": 115
-        }
-      ]
-    },
-    {
-      "id": "l8",
-      "title": "Cards that are too broad",
-      "category": "mistake",
-      "sources": [
-        {
-          "start": 115,
-          "end": 135
-        }
-      ]
-    },
-    {
-      "id": "l9",
-      "title": "Highlighting without retrieval",
-      "category": "mistake",
-      "sources": [
-        {
-          "start": 135,
-          "end": 155
-        }
-      ]
-    },
-    {
-      "id": "l10",
-      "title": "Engineering, medicine, and music use cases",
-      "category": "application",
-      "sources": [
-        {
-          "start": 155,
-          "end": 175
-        }
-      ]
-    },
-    {
-      "id": "l11",
-      "title": "Massed practice fools short-term performance",
-      "category": "argument",
-      "sources": [
-        {
-          "start": 175,
-          "end": 195
-        }
-      ]
-    },
-    {
-      "id": "l12",
-      "title": "Start small: atomic cards, daily review",
-      "category": "application",
-      "sources": [
-        {
-          "start": 195,
+          "start": 162,
           "end": 215
         }
       ]
     },
     {
-      "id": "l13",
-      "title": "Rate honestly to keep the queue healthy",
-      "category": "takeaway",
+      "id": "l3",
+      "title": "Layers: input, hidden, and output",
+      "category": "concept",
       "sources": [
         {
           "start": 215,
-          "end": 235
+          "end": 331
         }
       ]
     },
     {
-      "id": "l14",
-      "title": "Three takeaways: schedule, retrieve, keep cards small",
+      "id": "l4",
+      "title": "Why stack layers (hierarchical features)",
+      "category": "argument",
+      "sources": [
+        {
+          "start": 331,
+          "end": 518
+        }
+      ]
+    },
+    {
+      "id": "l5",
+      "title": "Edge detection as an early-layer idea",
+      "category": "example",
+      "sources": [
+        {
+          "start": 518,
+          "end": 694
+        }
+      ]
+    },
+    {
+      "id": "l6",
+      "title": "Weights, biases, and parameter counting",
+      "category": "mechanism",
+      "sources": [
+        {
+          "start": 694,
+          "end": 750
+        }
+      ]
+    },
+    {
+      "id": "l7",
+      "title": "How learning fits into the bigger picture",
+      "category": "concept",
+      "sources": [
+        {
+          "start": 750,
+          "end": 806
+        }
+      ]
+    },
+    {
+      "id": "l8",
+      "title": "Linear algebra notation for networks",
+      "category": "prerequisite",
+      "sources": [
+        {
+          "start": 806,
+          "end": 917
+        }
+      ]
+    },
+    {
+      "id": "l9",
+      "title": "Recap of the neural network picture",
       "category": "takeaway",
       "sources": [
         {
-          "start": 235,
-          "end": 255
+          "start": 917,
+          "end": 987
+        }
+      ]
+    },
+    {
+      "id": "l10",
+      "title": "ReLU vs Sigmoid activations",
+      "category": "mechanism",
+      "sources": [
+        {
+          "start": 1023,
+          "end": 1120
         }
       ]
     }
@@ -356,33 +981,33 @@
   "diagrams": [
     {
       "id": "d1",
-      "title": "Memory systems at a glance",
-      "caption": "Spaced repetition mainly consolidates traces into long-term memory via repeated retrieval.",
-      "segmentId": "s2",
-      "start": 12,
-      "end": 28,
+      "title": "A neuron as weighted sum + nonlinearity",
+      "caption": "Inputs are combined with weights and a bias, then passed through an activation.",
+      "segmentId": "s20",
+      "start": 162,
+      "end": 215,
       "kind": "mermaid",
-      "mermaid": "flowchart LR\n  S[Sensory memory] --> W[Working memory]\n  W -->|encoding + retrieval practice| L[Long-term memory]\n  L -->|recall| W"
+      "mermaid": "flowchart LR\n  X1[x1] --> S[Weighted sum + bias]\n  X2[x2] --> S\n  Xn[xn] --> S\n  S --> A[Activation]\n  A --> Y[Neuron output]"
     },
     {
       "id": "d2",
-      "title": "SM-2 rating → next interval",
-      "caption": "Honest ratings keep the queue healthy: Again resets; Hard/Good/Easy grow the interval.",
-      "segmentId": "s5",
-      "start": 62,
-      "end": 80,
+      "title": "Layers in a feedforward network",
+      "caption": "Pixels feed hidden layers that build features; the last layer outputs digit probabilities.",
+      "segmentId": "s25",
+      "start": 215,
+      "end": 331,
       "kind": "mermaid",
-      "mermaid": "flowchart TD\n  R[Review card] --> A{Rating}\n  A -->|Again| X[Short delay / reset]\n  A -->|Hard| H[Smaller interval growth]\n  A -->|Good| G[Standard ease × interval]\n  A -->|Easy| E[Larger interval + ease bump]\n  X --> N[Next review]\n  H --> N\n  G --> N\n  E --> N"
+      "mermaid": "flowchart LR\n  I[Input layer<br/>pixels] --> H1[Hidden layer]\n  H1 --> H2[Hidden layer]\n  H2 --> O[Output layer<br/>digit scores]"
     },
     {
       "id": "d3",
-      "title": "Forgetting curve vs spaced reviews",
-      "caption": "Each successful recall flattens the curve. SVG sketch for the sample lesson.",
-      "segmentId": "s3",
-      "start": 28,
-      "end": 45,
-      "kind": "svg",
-      "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 420 180\" role=\"img\" aria-label=\"Forgetting curve with spaced reviews\"><rect width=\"420\" height=\"180\" fill=\"#fff\"/><text x=\"12\" y=\"20\" font-family=\"system-ui,sans-serif\" font-size=\"12\" fill=\"#64748b\">Recall strength</text><path d=\"M40 30 C 100 40, 140 110, 200 140 C 260 160, 320 168, 390 170\" fill=\"none\" stroke=\"#94a3b8\" stroke-width=\"2\" stroke-dasharray=\"4 4\"/><path d=\"M40 30 C 90 38, 110 70, 130 90\" fill=\"none\" stroke=\"#4f46e5\" stroke-width=\"2.5\"/><path d=\"M130 50 C 170 58, 190 95, 220 115\" fill=\"none\" stroke=\"#4f46e5\" stroke-width=\"2.5\"/><path d=\"M220 55 C 270 65, 300 100, 340 120\" fill=\"none\" stroke=\"#4f46e5\" stroke-width=\"2.5\"/><circle cx=\"130\" cy=\"90\" r=\"4\" fill=\"#4f46e5\"/><circle cx=\"220\" cy=\"115\" r=\"4\" fill=\"#4f46e5\"/><circle cx=\"340\" cy=\"120\" r=\"4\" fill=\"#4f46e5\"/><text x=\"118\" y=\"108\" font-family=\"system-ui,sans-serif\" font-size=\"10\" fill=\"#334155\">R1</text><text x=\"208\" y=\"133\" font-family=\"system-ui,sans-serif\" font-size=\"10\" fill=\"#334155\">R2</text><text x=\"328\" y=\"138\" font-family=\"system-ui,sans-serif\" font-size=\"10\" fill=\"#334155\">R3</text><text x=\"300\" y=\"28\" font-family=\"system-ui,sans-serif\" font-size=\"11\" fill=\"#64748b\">dashed = no review</text><line x1=\"40\" y1=\"170\" x2=\"390\" y2=\"170\" stroke=\"#cbd5e1\"/><line x1=\"40\" y1=\"30\" x2=\"40\" y2=\"170\" stroke=\"#cbd5e1\"/><text x=\"180\" y=\"178\" font-family=\"system-ui,sans-serif\" font-size=\"11\" fill=\"#64748b\">Time →</text></svg>"
+      "title": "Hierarchy: edges → patterns → objects",
+      "caption": "Earlier layers can pick up edges; later layers combine those into more abstract structure.",
+      "segmentId": "s61",
+      "start": 518,
+      "end": 694,
+      "kind": "mermaid",
+      "mermaid": "flowchart TD\n  P[Pixels] --> E[Edges / local structure]\n  E --> Pat[Patterns / loops]\n  Pat --> Obj[Digit-like structures]\n  Obj --> D[Digit prediction]"
     }
   ]
 }

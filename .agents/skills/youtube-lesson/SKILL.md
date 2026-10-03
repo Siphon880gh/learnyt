@@ -28,7 +28,7 @@ Confirm the video ID before writing files.
 Prefer producing lesson JSON the user can **Import** on the Learnyt home page (browser localStorage). Optionally also write a file for convenience:
 
 ```
-data/lessons/{videoId}.json   # only if asked; do not overwrite sample-spaced-rep
+data/lessons/{videoId}.json   # only if asked; do not overwrite sample-spaced-rep unless fixing a transcript/video mismatch
 ```
 
 Product path: harness JSON → user Import (localStorage) → optional **Sync to demo** (gitignored `data/demo/lessons/`, server password).
@@ -56,7 +56,13 @@ Extract with regex:
 - `(?:v=|/youtu\.be/|/embed/|/shorts/)([A-Za-z0-9_-]{11})`
 - or validate bare 11-char id
 
-### 2. Obtain transcript with timestamps
+### 2. Obtain transcript with timestamps (must match the real video)
+
+**Hard rule:** The transcript `text` and `start`/`end` timestamps **must come from the actual video’s captions** (manual or auto) for the same YouTube id that the lesson embeds (`video.id` when it is an 11-char YouTube id, otherwise `video.embedId`).
+
+- **Do not invent** a script, paraphrase a different lecture, or reuse synthetic copy that does not match what is spoken.
+- After parsing VTT, spot-check the first ~30s and one mid-video line against the player. If words and times do not match the audio, stop and re-fetch — do not ship the lesson.
+- If `video.id` is a demo/seed id (e.g. `sample-spaced-rep`) but `embedId` points at a real video, the transcript **still must match `embedId`**.
 
 **Prefer (local):**
 
@@ -66,7 +72,7 @@ php api/transcript_helper.php VIDEO_ID
 php api/transcript_helper.php --url 'https://www.youtube.com/watch?v=VIDEO_ID'
 ```
 
-This wraps `yt-dlp` (subtitles → VTT → segments). Requires `yt-dlp` on PATH (or `YT_DLP_PATH` in `.env`).
+This wraps `yt-dlp` (subtitles → VTT → segments). Requires `yt-dlp` on PATH (or `YT_DLP_PATH` in `.env`). Use the **embedded** YouTube id (`embedId` if present).
 
 **Direct yt-dlp:**
 
@@ -75,7 +81,7 @@ yt-dlp --skip-download --write-auto-sub --write-sub --sub-lang en \
   --convert-subs vtt -o '/tmp/learnyt_%(id)s' -- 'https://www.youtube.com/watch?v=VIDEO_ID'
 ```
 
-Parse VTT cues into `{id, start, end, text}` segments. Deduplicate overlapping auto-caption lines.
+Parse VTT cues into `{id, start, end, text}` segments. Deduplicate overlapping auto-caption lines. Merge tiny cues into readable segments (~8–25s) **without changing wording** beyond light cleanup (strip VTT tags, collapse whitespace).
 
 **Metadata (title, channel, duration, thumbnail):**
 
@@ -89,10 +95,11 @@ Map fields: `id`, `title`, `channel`/`uploader`, `duration`, `thumbnail`.
 
 1. Manual captions / auto-subs via yt-dlp (`--write-sub` then `--write-auto-sub`)
 2. Other local transcript CLIs the environment already has (e.g. `youtube_transcript_api` via Python) — prefer tools already installed; do not invent API keys
-3. If no captions exist: tell the user, offer to stop, or build a coarse TOC from chapters/`description` timestamps only (mark `meta.transcriptConfidence: "low"`)
+3. If no captions exist: tell the user and stop (or build TOC-only from chapters with an empty/`low` transcript). **Never fabricate spoken lines.**
 
 **Never:**
 
+- Invent a transcript that does not match the embedded video’s captions/audio
 - Put API keys in frontend, HTML, CSS, query params, or committed files
 - Commit `.env`
 - Call paid APIs unless the user explicitly configured server-side `.env` and asked you to
@@ -299,7 +306,7 @@ The PHP UI (`lesson.php` + Mermaid CDN):
 
 - Titles are specific (not “Part 1”, “Section 2”) unless the speaker uses those labels
 - Learning TOC covers definitions + mechanisms + examples + takeaways when present
-- Transcript is readable (punctuation cleaned; no raw VTT tags)
+- Transcript is readable (punctuation cleaned; no raw VTT tags) **and matches the embedded video’s real captions/timemarks**
 - Visualizable concepts have Mermaid entries in `diagrams[]` with `segmentId` + `start` (inline visual breaks)
 - No secrets in the JSON
 
@@ -311,7 +318,7 @@ The PHP UI (`lesson.php` + Mermaid CDN):
 
 - [ ] Parsed video id
 - [ ] Fetched metadata
-- [ ] Fetched / parsed transcript (or documented failure)
+- [ ] Fetched / parsed **real** transcript for the embedded video id (spot-checked vs player; no synthetic mismatch)
 - [ ] Built chronological TOC
 - [ ] Built learning TOC with categories + source timestamps
 - [ ] Added Mermaid visual breaks (`diagrams[]` with `kind: "mermaid"`, `segmentId`, `start`) for illustratable concepts
