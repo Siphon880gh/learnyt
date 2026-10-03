@@ -1035,6 +1035,44 @@
     setModeUi('ease');
   }
 
+
+  function initDayNightTheme() {
+    const KEY = 'learnyt-theme';
+    const btn = document.querySelector('.js-theme-toggle');
+    if (!btn) return;
+
+    function readTheme() {
+      try {
+        return localStorage.getItem(KEY) === 'night' ? 'night' : 'day';
+      } catch (_) {
+        return 'day';
+      }
+    }
+
+    function applyTheme(theme) {
+      const night = theme === 'night';
+      if (night) {
+        document.documentElement.setAttribute('data-theme', 'night');
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+      }
+      btn.setAttribute('aria-pressed', night ? 'true' : 'false');
+      btn.title = night ? 'Switch to day theme' : 'Switch to night theme';
+      const label = btn.querySelector('.js-theme-toggle-label');
+      if (label) label.textContent = night ? 'Night' : 'Day';
+      try {
+        localStorage.setItem(KEY, night ? 'night' : 'day');
+      } catch (_) {}
+    }
+
+    applyTheme(readTheme());
+
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      applyTheme(readTheme() === 'night' ? 'day' : 'night');
+    });
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     if (window.LearnytStorage && window.LEARNYT && window.LEARNYT.hydrateLocal) {
       window.LearnytStorage.hydrateLessonPage();
@@ -1044,6 +1082,7 @@
     initHighlights();
     initCopyDeepLink();
     initLessonNav();
+    initDayNightTheme();
     initLearnSrs();
     initReview();
     initMermaid();

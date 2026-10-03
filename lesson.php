@@ -115,7 +115,13 @@ layout_header($title, array('nav' => 'home'));
          class="lesson-nav-link px-3 py-1.5 rounded-md text-slate-600 hover:bg-slate-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900"><?= e($label) ?></a>
       <?php endforeach; ?>
     </nav>
-    <div class="lesson-nav-sync shrink-0 ml-auto flex justify-end">
+    <div class="lesson-nav-tools shrink-0 ml-auto flex items-center justify-end gap-2">
+      <button type="button"
+        class="js-theme-toggle theme-toggle inline-flex items-center rounded-md border border-slate-300 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900"
+        aria-pressed="false"
+        title="Switch to night theme">
+        <span class="js-theme-toggle-label">Day</span>
+      </button>
       <?php render_transcript_sync_control('sticky'); ?>
     </div>
   </div>
