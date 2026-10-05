@@ -43,6 +43,13 @@
   outline-offset: 2px;
 }
 
+.toc-link.is-current {
+  background-color: rgb(226 232 240);
+  color: rgb(15 23 42);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 rgb(15 23 42);
+}
+
 /* YouTube embed aspect */
 .video-frame {
   aspect-ratio: 16 / 9;
@@ -480,6 +487,12 @@ html[data-theme="night"] #selection-toolbar button:hover {
 
 html[data-theme="night"] .toc-link:hover {
   background-color: #334155 !important;
+}
+
+html[data-theme="night"] .toc-link.is-current {
+  background-color: #334155 !important;
+  color: #f8fafc !important;
+  box-shadow: inset 3px 0 0 #38bdf8;
 }
 
 html[data-theme="night"] .toc-link:focus-visible {

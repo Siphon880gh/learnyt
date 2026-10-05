@@ -139,6 +139,8 @@
         const u = new URL(window.location.href);
         u.searchParams.set('toc', mode);
         history.replaceState(null, '', u.toString());
+        // The newly revealed TOC already has its current chapter marked.
+        window.dispatchEvent(new CustomEvent('learnyt:toc-mode-change'));
       });
     });
 
@@ -152,6 +154,111 @@
         highlightSegAt(Number(t));
       });
     });
+  }
+
+  // --- Transcript scroll position -> both TOCs ---
+  function initTranscriptTocTracking() {
+    const list = document.getElementById('transcript-list');
+    if (!list || !list.querySelector('.transcript-seg')) return;
+
+    let frame = null;
+    let currentTime = null;
+
+    function stickyOffset() {
+      const raw = getComputedStyle(document.documentElement).getPropertyValue('--sticky-stack');
+      let value = parseFloat(raw);
+      if (raw.trim().endsWith('rem')) {
+        value *= parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+      }
+      return isNaN(value) ? 124 : value;
+    }
+
+    function transcriptTimeAtReadingLine() {
+      const segs = list.querySelectorAll('.transcript-seg');
+      if (!segs.length) return null;
+
+      // Treat the line just below the sticky navigation as the reader's position.
+      const readingLine = Math.min(window.innerHeight * 0.42, stickyOffset() + 32);
+      const listRect = list.getBoundingClientRect();
+      if (listRect.top > readingLine) return null;
+
+      let active = segs[0];
+      for (let i = 0; i < segs.length; i++) {
+        if (segs[i].getBoundingClientRect().top <= readingLine) active = segs[i];
+        else break;
+      }
+      return Number(active.dataset.start);
+    }
+
+    function linkForTime(panel, time) {
+      const links = panel.querySelectorAll('.toc-link[data-seek]');
+      let containing = null;
+      let preceding = null;
+      let precedingStart = -Infinity;
+
+      links.forEach(function (link) {
+        const start = Number(link.dataset.seek);
+        const end = Number(link.dataset.end);
+        if (isNaN(start)) return;
+        if (start <= time && start >= precedingStart) {
+          preceding = link;
+          precedingStart = start;
+        }
+        if (start <= time && (!isNaN(end) ? time < end : true)) containing = link;
+      });
+      return containing || preceding || links[0] || null;
+    }
+
+    function keepVisible(link) {
+      if (!link) return;
+      const panel = link.closest('[role="tabpanel"]');
+      if (!panel || panel.classList.contains('hidden')) return;
+      const scroller = link.closest('#chrono, #learn');
+      if (!scroller || scroller.scrollHeight <= scroller.clientHeight) return;
+      const linkRect = link.getBoundingClientRect();
+      const scrollRect = scroller.getBoundingClientRect();
+      if (linkRect.top < scrollRect.top) {
+        scroller.scrollTo({ top: scroller.scrollTop + linkRect.top - scrollRect.top - 8, behavior: 'smooth' });
+      } else if (linkRect.bottom > scrollRect.bottom) {
+        scroller.scrollTo({ top: scroller.scrollTop + linkRect.bottom - scrollRect.bottom + 8, behavior: 'smooth' });
+      }
+    }
+
+    function markPanel(panel, time, reveal) {
+      if (!panel) return;
+      const next = time === null ? null : linkForTime(panel, time);
+      panel.querySelectorAll('.toc-link.is-current').forEach(function (link) {
+        if (link !== next) {
+          link.classList.remove('is-current');
+          link.removeAttribute('aria-current');
+        }
+      });
+      if (next) {
+        next.classList.add('is-current');
+        next.setAttribute('aria-current', 'location');
+        if (reveal) keepVisible(next);
+      }
+    }
+
+    function update(reveal) {
+      frame = null;
+      const nextTime = transcriptTimeAtReadingLine();
+      if (nextTime === currentTime && !reveal) return;
+      const chapterChanged = nextTime !== currentTime;
+      currentTime = nextTime;
+      markPanel(document.getElementById('toc-chrono'), nextTime, reveal || chapterChanged);
+      markPanel(document.getElementById('toc-learn'), nextTime, reveal || chapterChanged);
+    }
+
+    function schedule() {
+      if (frame !== null) return;
+      frame = requestAnimationFrame(function () { update(false); });
+    }
+
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule);
+    window.addEventListener('learnyt:toc-mode-change', function () { update(true); });
+    update(false);
   }
 
   function highlightSegAt(t) {
@@ -1095,6 +1202,7 @@
       window.LearnytStorage.hydrateLessonPage();
     }
     initToc();
+    initTranscriptTocTracking();
     initSelectionToolbar();
     initHighlights();
     initCopyDeepLink();

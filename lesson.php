@@ -178,6 +178,7 @@ layout_header($title, array('nav' => 'home'));
             <a href="<?= e(lesson_deep_link($videoId, ['t' => (int) ($item['start'] ?? 0), 'toc' => 'chrono', 'seg' => $item['id'] ?? ''])) ?>"
                class="toc-link flex gap-2 rounded-md px-2 py-1.5 hover:bg-slate-50 text-slate-700"
                data-seek="<?= (float) ($item['start'] ?? 0) ?>"
+               data-end="<?= (float) ($item['end'] ?? $item['start'] ?? 0) ?>"
                data-toc-id="<?= e((string) ($item['id'] ?? '')) ?>">
               <span class="tabular-nums text-slate-400 shrink-0 w-12"><?= e(format_time((int) ($item['start'] ?? 0))) ?></span>
               <span><?= e((string) ($item['title'] ?? 'Section')) ?></span>
@@ -209,11 +210,13 @@ layout_header($title, array('nav' => 'home'));
               <?php foreach ($items as $item):
                 $src = $item['sources'][0] ?? [];
                 $st = (float) ($src['start'] ?? 0);
+                $en = (float) ($src['end'] ?? $st);
               ?>
               <li>
                 <a href="<?= e(lesson_deep_link($videoId, ['t' => (int) $st, 'toc' => 'learn', 'seg' => $item['id'] ?? ''])) ?>"
                    class="toc-link block rounded-md px-2 py-1.5 hover:bg-slate-50 text-slate-700"
                    data-seek="<?= $st ?>"
+                   data-end="<?= $en ?>"
                    data-toc-id="<?= e((string) ($item['id'] ?? '')) ?>"
                    data-srs-title="<?= e((string) ($item['title'] ?? '')) ?>"
                    data-source-type="learn">

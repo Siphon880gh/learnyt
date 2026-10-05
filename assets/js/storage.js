@@ -523,6 +523,8 @@
             encodeURIComponent(item.id || '') +
             '" class="toc-link flex gap-2 rounded-md px-2 py-1.5 hover:bg-slate-50 text-slate-700" data-seek="' +
             (item.start || 0) +
+            '" data-end="' +
+            (item.end != null ? item.end : item.start || 0) +
             '" data-toc-id="' +
             escapeHtml(item.id || '') +
             '"><span class="tabular-nums text-slate-400 shrink-0 w-12">' +
@@ -542,6 +544,7 @@
         .map(function (item) {
           var src = (item.sources && item.sources[0]) || {};
           var st = src.start || 0;
+          var en = src.end != null ? src.end : st;
           return (
             '<li><a href="lesson.php?v=' +
             encodeURIComponent(cfg.videoId) +
@@ -551,6 +554,8 @@
             encodeURIComponent(item.id || '') +
             '" class="toc-link block rounded-md px-2 py-1.5 hover:bg-slate-50 text-slate-700" data-seek="' +
             st +
+            '" data-end="' +
+            en +
             '" data-toc-id="' +
             escapeHtml(item.id || '') +
             '" data-srs-title="' +
