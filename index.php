@@ -25,20 +25,24 @@ layout_header('Home', array('nav' => 'home'));
         class="inline-flex h-5 w-5 items-center justify-center rounded-full border border-slate-300 bg-white text-[11px] font-semibold italic text-slate-500 hover:border-slate-400 hover:text-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-1"
         aria-expanded="false"
         aria-controls="tokens-info-panel"
-        title="Why not paste a YouTube link here?">
-        <span class="sr-only">Why you don’t paste a YouTube link in the app</span>
+        title="Why is this not automatic">
+        <span class="sr-only">Why is this not automatic</span>
         i
       </button>
       <span id="tokens-info-panel"
         role="region"
         aria-labelledby="tokens-info-btn"
         hidden
-        class="absolute left-0 top-full z-30 mt-2 w-72 sm:w-80 rounded-lg border border-slate-200 bg-white p-3 text-sm font-normal not-italic text-slate-600 leading-relaxed shadow-lg normal-case tracking-normal">
-        <strong class="font-medium text-slate-800">No free tokens.</strong>
-        This is a free service so you’ll have to use your own tokens. There are three ways:
-        integrate your API key into the app, a prompt builder you copy into your own ChatGPT/Claude,
-        or harness-first where you talk to the codebase to generate the artifacts you see in the rendered app.
-        <strong class="font-medium text-slate-800">Decision: harness-first.</strong>
+        class="absolute left-0 top-full z-30 mt-2 w-[min(36rem,calc(100vw-2rem))] max-h-[70vh] overflow-y-auto rounded-lg border border-slate-200 bg-white p-3 text-sm font-normal not-italic text-slate-600 leading-relaxed shadow-lg normal-case tracking-normal text-left">
+        <p class="mb-2">Weng provides this service for free and cannot cover the ongoing cost of AI tokens. That's why this Prompt Builder is designed to let users supply their own AI processing resources rather than having the app pay for them. This is also why AI processing isn't integrated directly into the app for a more seamless experience.</p>
+        <p class="mb-2">There are several ways to accomplish this:</p>
+        <ol class="mb-2 list-decimal space-y-1 pl-5">
+          <li><strong class="font-medium text-slate-800">Copy the generated prompt into ChatGPT or Claude:</strong> Users can use their existing AI subscriptions to process the prompt.</li>
+          <li><strong class="font-medium text-slate-800">Copy the generated prompt into an AI harness like Cursor or Claude Code:</strong> Users can leverage their own AI coding environments and available token allowances.</li>
+          <li><strong class="font-medium text-slate-800">Provide their own API key:</strong> The app could process prompts directly using the user's API key, with usage billed to the user. However, this requires trusting that the app does not store, log, or copy the key. This is generally easier to verify with a locally running application or a Chrome extension, although neither is inherently secure without reviewing how it handles credentials.</li>
+        </ol>
+        <p class="mb-2"><strong class="font-medium text-slate-800">For now, letting you use your own AI tools is the most practical approach.</strong> It keeps the service free while allowing you to use AI resources you already have access to. This app uses the method best suited to its particular workflow.</p>
+        <p>If the service eventually becomes commercial and can sustain the cost of AI tokens, AI processing could be integrated directly into the app for a more seamless experience.</p>
       </span>
     </span>.
     Open this project in an AI coding harness,

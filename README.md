@@ -7,7 +7,17 @@
 
 By Weng (Weng Fei Fung). Generate transcripts, lessons, spaced repetition, infographics/diagrams for any Youtube video where learning is important.
 
-**No free tokens.** This is a free service so you'll have to use your own tokens. There are three ways: integrate your API key into the app, a prompt builder you copy into your own ChatGPT/Claude, or harness-first where you talk to the codebase to generate the artifacts you see in the rendered app. **Decision: harness-first.**
+**Why is this not automatic.** Weng provides this service for free and cannot cover the ongoing cost of AI tokens. That's why this Prompt Builder is designed to let users supply their own AI processing resources rather than having the app pay for them. This is also why AI processing isn't integrated directly into the app for a more seamless experience.
+
+There are several ways to accomplish this:
+
+1. **Copy the generated prompt into ChatGPT or Claude:** Users can use their existing AI subscriptions to process the prompt.
+2. **Copy the generated prompt into an AI harness like Cursor or Claude Code:** Users can leverage their own AI coding environments and available token allowances.
+3. **Provide their own API key:** The app could process prompts directly using the user's API key, with usage billed to the user. However, this requires trusting that the app does not store, log, or copy the key. This is generally easier to verify with a locally running application or a Chrome extension, although neither is inherently secure without reviewing how it handles credentials.
+
+**For now, letting you use your own AI tools is the most practical approach.** It keeps the service free while allowing you to use AI resources you already have access to. This app uses the method best suited to its particular workflow.
+
+If the service eventually becomes commercial and can sustain the cost of AI tokens, AI processing could be integrated directly into the app for a more seamless experience. **This app uses harness-first.**
 
 Harness-first **YouTube → interactive learning modules**.
 
