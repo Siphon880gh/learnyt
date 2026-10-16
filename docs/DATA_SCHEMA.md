@@ -36,6 +36,8 @@ type Lesson = {
   chronologicalToc: ChronoItem[]
   learningToc: LearnItem[]
   diagrams?: Diagram[]
+  guides?: Guide[]
+  moc?: MapOfContent
 }
 
 type TranscriptSegment = {
@@ -87,6 +89,42 @@ Guidelines for the skill:
 - Keep Mermaid diagrams small (roughly ≤ 20 nodes)
 - Always set `start` (and `segmentId` when possible) so the UI can jump to source
 - Do not embed secrets or private URLs in `imageUrl`
+
+
+## Concept guides and map of content
+
+Optional. Include them when the video has ideas that a short written guide would make easier to study. A lesson with no `guides` (or an empty array) still loads; the lesson page grays out **Guides learning**.
+
+```ts
+type Guide = {
+  id: string                   // e.g. "g1"
+  title: string
+  category?: 'prerequisite' | 'definition' | 'concept' | 'argument'
+    | 'mechanism' | 'example' | 'application' | 'mistake' | 'takeaway' | 'other'
+  oneSentence?: string
+  body?: string                // plain prose; blank line between paragraphs
+  prerequisiteGuideIds?: string[]
+  relatedGuideIds?: string[]
+  diagramIds?: string[]        // ids from diagrams[]
+  learningTocIds?: string[]
+  sources: { start: number; end?: number; segmentIds?: string[] }[]
+}
+
+type MapOfContent = {
+  id?: string
+  title?: string
+  orientation?: string         // how to read the guides
+  readingOrder?: string[]      // every guide id once, in study order
+  clusters?: {
+    id: string
+    title: string
+    blurb?: string
+    entries: { guideId: string; why?: string }[]
+  }[]
+}
+```
+
+The map organizes the guides. It is separate from both tables of contents. Each guide should point at real transcript timestamps.
 
 
 ## Highlights

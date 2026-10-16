@@ -121,6 +121,84 @@
     }
   }
 
+  // --- Transcript learning vs Guides learning ---
+  let openGuideId = 'moc';
+
+  function showGuidePane(id) {
+    const mocDoc = document.getElementById('moc-document');
+    const guide = id && id !== 'moc' ? document.getElementById('guide-' + id) : null;
+    const showing = guide ? id : 'moc';
+    openGuideId = showing;
+    if (mocDoc) mocDoc.classList.toggle('hidden', showing !== 'moc');
+    document.querySelectorAll('#guide-articles .guide-card').forEach((article) => {
+      article.classList.toggle('hidden', article.getAttribute('data-guide-id') !== showing);
+    });
+    document.querySelectorAll('#moc-nav .moc-link').forEach((el) => {
+      const on = el.getAttribute('data-guide-id') === showing;
+      el.classList.toggle('is-current', on);
+      if (on) el.setAttribute('aria-current', 'page');
+      else el.removeAttribute('aria-current');
+    });
+    const pane = showing === 'moc' ? mocDoc : guide;
+    const guidesRoot = document.getElementById('guides-learning');
+    if (!pane || !guidesRoot || guidesRoot.classList.contains('hidden')) return;
+    requestAnimationFrame(() => {
+      if (showing !== 'moc') runMermaid(pane);
+      pane.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
+
+  function setStudyMode(mode) {
+    const guidesBtn = document.querySelector('[data-study-mode="guides"]');
+    const canGuides = !!(guidesBtn && !guidesBtn.disabled);
+    if (mode !== 'guides' || !canGuides) mode = 'transcript';
+
+    document.querySelectorAll('[data-study-mode]').forEach((btn) => {
+      const on = btn.getAttribute('data-study-mode') === mode && !btn.disabled;
+      btn.setAttribute('aria-selected', on ? 'true' : 'false');
+      btn.classList.toggle('bg-slate-900', on);
+      btn.classList.toggle('text-white', on);
+      btn.classList.toggle('text-slate-600', !on);
+    });
+
+    const showGuides = mode === 'guides';
+    document.getElementById('transcript-learning-panel')?.classList.toggle('hidden', showGuides);
+    document.getElementById('transcript-learning')?.classList.toggle('hidden', showGuides);
+    document.getElementById('guides-learning-panel')?.classList.toggle('hidden', !showGuides);
+    document.getElementById('guides-learning')?.classList.toggle('hidden', !showGuides);
+    if (window.LEARNYT) window.LEARNYT.study = mode;
+    if (showGuides) showGuidePane(openGuideId || 'moc');
+
+    const url = new URL(window.location.href);
+    if (url.searchParams.has('study')) {
+      url.searchParams.delete('study');
+      history.replaceState(null, '', url.toString());
+    }
+  }
+
+  function initStudyMode() {
+    document.querySelectorAll('[data-study-mode]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (btn.disabled) return;
+        setStudyMode(btn.getAttribute('data-study-mode'));
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      const link = e.target.closest('a[data-guide-id]');
+      if (!link) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+      const id = link.getAttribute('data-guide-id') || '';
+      if (!/^[A-Za-z0-9_-]+$/.test(id)) return;
+      if (id !== 'moc' && !document.getElementById('guide-' + id)) return;
+      e.preventDefault();
+      openGuideId = id;
+      setStudyMode('guides');
+    });
+
+    setStudyMode('transcript');
+  }
+
   // --- TOC toggle ---
   function initToc() {
     document.querySelectorAll('[data-toc-mode]').forEach((btn) => {
@@ -555,6 +633,7 @@
         const section = a.getAttribute('data-section');
         if (section === 'review') return;
         e.preventDefault();
+        setStudyMode('transcript');
         const map = {
           overview: 'overview',
           chrono: 'chrono',
@@ -570,7 +649,9 @@
           document.querySelector('[data-toc-mode="chrono"]')?.click();
         }
         const id = map[section];
-        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        requestAnimationFrame(() => {
+          document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
       });
     });
   }
@@ -632,6 +713,23 @@
   }
 
 
+  function runMermaid(root) {
+    if (typeof mermaid === 'undefined') return;
+    const scope = root || document;
+    const fresh = [];
+    scope.querySelectorAll('pre.mermaid').forEach((node) => {
+      if (node.getAttribute('data-processed') === 'true') return;
+      if (node.closest('.hidden')) return;
+      fresh.push(node);
+    });
+    if (!fresh.length) return;
+    try {
+      mermaid.run({ nodes: fresh });
+    } catch (err) {
+      console.warn('Mermaid run failed', err);
+    }
+  }
+
   function initMermaid() {
     if (typeof mermaid === 'undefined') return;
     try {
@@ -641,10 +739,7 @@
         securityLevel: 'strict',
         flowchart: { htmlLabels: false },
       });
-      const nodes = document.querySelectorAll('pre.mermaid');
-      if (nodes.length) {
-        mermaid.run({ nodes: nodes });
-      }
+      runMermaid(document);
     } catch (err) {
       console.warn('Mermaid init failed', err);
     }
@@ -1201,6 +1296,7 @@
     if (window.LearnytStorage && window.LEARNYT && window.LEARNYT.hydrateLocal) {
       window.LearnytStorage.hydrateLessonPage();
     }
+    initStudyMode();
     initToc();
     initTranscriptTocTracking();
     initSelectionToolbar();

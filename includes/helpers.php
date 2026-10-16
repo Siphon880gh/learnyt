@@ -199,12 +199,121 @@ function category_label($cat): string
 }
 
 /**
+ * Guides plus a map of content, in reading order.
+ * Guides with no map entry are appended so none are dropped.
+ * An empty guide list yields hasGuides false.
+ *
+ * @param array $lesson
+ * @return array{guides: array, byId: array, moc: array, hasGuides: bool}
+ */
+function lesson_guide_pack(array $lesson): array
+{
+    $rawGuides = isset($lesson['guides']) && is_array($lesson['guides']) ? $lesson['guides'] : array();
+    $byId = array();
+    foreach ($rawGuides as $guide) {
+        if (!is_array($guide)) {
+            continue;
+        }
+        $id = isset($guide['id']) ? trim((string) $guide['id']) : '';
+        $title = isset($guide['title']) ? trim((string) $guide['title']) : '';
+        if ($id === '' || $title === '' || isset($byId[$id])) {
+            continue;
+        }
+        $byId[$id] = $guide;
+    }
+
+    $moc = isset($lesson['moc']) && is_array($lesson['moc']) ? $lesson['moc'] : array();
+    $rawClusters = isset($moc['clusters']) && is_array($moc['clusters']) ? $moc['clusters'] : array();
+    $clusters = array();
+    $seen = array();
+    foreach ($rawClusters as $cluster) {
+        if (!is_array($cluster)) {
+            continue;
+        }
+        $entries = array();
+        $rawEntries = isset($cluster['entries']) && is_array($cluster['entries']) ? $cluster['entries'] : array();
+        foreach ($rawEntries as $entry) {
+            if (!is_array($entry)) {
+                continue;
+            }
+            $gid = isset($entry['guideId']) ? (string) $entry['guideId'] : '';
+            if ($gid === '' || !isset($byId[$gid]) || isset($seen[$gid])) {
+                continue;
+            }
+            $seen[$gid] = true;
+            $entries[] = $entry;
+        }
+        if (count($entries) === 0) {
+            continue;
+        }
+        $cluster['entries'] = $entries;
+        $clusters[] = $cluster;
+    }
+
+    $missing = array();
+    foreach ($byId as $gid => $guide) {
+        if (!isset($seen[$gid])) {
+            $missing[] = array(
+                'guideId' => $gid,
+                'why' => isset($guide['oneSentence']) ? (string) $guide['oneSentence'] : '',
+            );
+        }
+    }
+    if (count($missing) > 0) {
+        $clusters[] = array(
+            'id' => 'mc-rest',
+            'title' => count($clusters) === 0 ? 'Guides' : 'Also in this lesson',
+            'blurb' => '',
+            'entries' => $missing,
+        );
+    }
+
+    $reading = array();
+    $used = array();
+    $rawOrder = isset($moc['readingOrder']) && is_array($moc['readingOrder']) ? $moc['readingOrder'] : array();
+    foreach ($rawOrder as $gid) {
+        $gid = (string) $gid;
+        if (isset($byId[$gid]) && !isset($used[$gid])) {
+            $reading[] = $gid;
+            $used[$gid] = true;
+        }
+    }
+    foreach ($clusters as $cluster) {
+        foreach ($cluster['entries'] as $entry) {
+            $gid = (string) $entry['guideId'];
+            if (!isset($used[$gid])) {
+                $reading[] = $gid;
+                $used[$gid] = true;
+            }
+        }
+    }
+
+    $ordered = array();
+    foreach ($reading as $gid) {
+        $ordered[] = $byId[$gid];
+    }
+
+    $title = isset($moc['title']) ? trim((string) $moc['title']) : '';
+    return array(
+        'guides' => $ordered,
+        'byId' => $byId,
+        'moc' => array(
+            'title' => $title !== '' ? $title : 'Map of content',
+            'orientation' => isset($moc['orientation']) ? (string) $moc['orientation'] : '',
+            'readingOrder' => $reading,
+            'clusters' => $clusters,
+        ),
+        'hasGuides' => count($ordered) > 0,
+    );
+}
+
+/**
  * Render a lesson diagram card (gallery or inline transcript break).
  * PHP 7.4 compatible. Mermaid/SVG/image only — no secrets.
  *
  * @param array $diagram
  * @param string $videoId
- * @param array $opts  context: 'inline'|'gallery'
+ * @param array $opts  context: 'inline'|'gallery'; domId: optional unique element id
  */
 function render_diagram_card(array $diagram, $videoId, array $opts = [])
 {
@@ -215,6 +324,7 @@ function render_diagram_card(array $diagram, $videoId, array $opts = [])
     $kind = (string) (isset($diagram['kind']) ? $diagram['kind'] : 'mermaid');
     $start = isset($diagram['start']) ? (float) $diagram['start'] : 0;
     $segmentId = isset($diagram['segmentId']) ? (string) $diagram['segmentId'] : '';
+    $domId = isset($opts['domId']) && $opts['domId'] !== '' ? (string) $opts['domId'] : ('dg-' . $id);
     $deep = lesson_deep_link($videoId, array(
         't' => (int) $start,
         'seg' => $segmentId,
@@ -224,7 +334,7 @@ function render_diagram_card(array $diagram, $videoId, array $opts = [])
         ? 'diagram-card diagram-inline my-4 rounded-xl border border-indigo-200 bg-indigo-50/40 p-4 sm:p-5'
         : 'diagram-card rounded-xl border border-slate-200 bg-white p-4 sm:p-5';
     ?>
-    <figure id="dg-<?= e($id) ?>" class="<?= e($wrapClass) ?>" data-diagram-id="<?= e($id) ?>" data-start="<?= e((string) $start) ?>" data-seg-id="<?= e($segmentId) ?>">
+    <figure id="<?= e($domId) ?>" class="<?= e($wrapClass) ?>" data-diagram-id="<?= e($id) ?>" data-start="<?= e((string) $start) ?>" data-seg-id="<?= e($segmentId) ?>">
       <div class="flex flex-wrap items-start justify-between gap-2 mb-3">
         <div class="min-w-0">
           <?php if ($context === 'inline'): ?>

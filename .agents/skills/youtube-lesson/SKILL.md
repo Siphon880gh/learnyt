@@ -190,6 +190,46 @@ Another useful pattern — sequence for ordered steps:
 
 Do **not** skip this step when the video clearly teaches something visualizable. Prefer Mermaid over SVG/image so the skill stays text-only. See also **Diagrams / infographics** below.
 
+### 5b. Concept guides and a map of content
+
+Add these when the video has ideas a short written guide would make easier to study. If the video has no such ideas, omit `guides` and `moc` (or use an empty `guides` array). The lesson page then grays out Guides learning.
+
+**`guides[]`** — one short guide per important concept (a definition, mechanism, distinction, argument, or takeaway the rest of the lecture depends on). Skip greetings, asides, and examples that only illustrate another concept; cite those examples inside the parent guide. Typical range is 4–12 guides. Stay inside what the transcript teaches.
+
+```json
+{
+  "id": "g1",
+  "title": "Specific concept title",
+  "category": "mechanism",
+  "oneSentence": "The idea in one sentence, in the speaker’s terms.",
+  "body": "120–220 words. What it is, why this lecture needs it, how it works, and one concrete example from the video.\n\nA second paragraph if needed. Blank line between paragraphs.",
+  "prerequisiteGuideIds": [],
+  "relatedGuideIds": ["g2"],
+  "diagramIds": ["d1"],
+  "learningTocIds": ["l3"],
+  "sources": [{ "start": 45, "end": 80, "segmentIds": ["s5", "s6"] }]
+}
+```
+
+`category` uses the learning-TOC set. `diagramIds` reference `diagrams[]`. `sources` are real transcript ranges.
+
+**`moc`** — a map of those guides, not a third table of contents of the video. `readingOrder` lists every guide id once. Each guide appears in exactly one cluster. `why` is one specific line.
+
+```json
+{
+  "id": "moc",
+  "title": "Map of content: …",
+  "orientation": "2–4 sentences on how the guides fit together and a sensible way to read them.",
+  "readingOrder": ["g1", "g2"],
+  "clusters": [{
+    "id": "mc1",
+    "title": "Name of this neighborhood of ideas",
+    "blurb": "Why these guides belong together.",
+    "entries": [{ "guideId": "g1", "why": "What this guide gives you before the next one." }]
+  }]
+}
+```
+
 ### 6. Write JSON
 
 Path: `data/lessons/{videoId}.json`
@@ -229,7 +269,31 @@ Minimum shape:
     "start": 0,
     "kind": "mermaid",
     "mermaid": "flowchart LR\n  A --> B"
-  }]
+  }],
+  "guides": [{
+    "id": "g1",
+    "title": "…",
+    "category": "concept",
+    "oneSentence": "…",
+    "body": "…",
+    "prerequisiteGuideIds": [],
+    "relatedGuideIds": [],
+    "diagramIds": [],
+    "learningTocIds": ["l1"],
+    "sources": [{ "start": 0, "end": 60, "segmentIds": ["s1"] }]
+  }],
+  "moc": {
+    "id": "moc",
+    "title": "Map of content: …",
+    "orientation": "…",
+    "readingOrder": ["g1"],
+    "clusters": [{
+      "id": "mc1",
+      "title": "…",
+      "blurb": "…",
+      "entries": [{ "guideId": "g1", "why": "…" }]
+    }]
+  }
 }
 ```
 
@@ -238,6 +302,7 @@ Use pretty-printed UTF-8 JSON. Validate:
 - Every TOC `start` is within `[0, duration]`
 - Segment ids unique; TOC ids unique
 - `video.id` matches filename stem
+- When `guides` is non-empty: every guide `sources` range is inside `[0, duration]`, every `segmentIds` / `diagramIds` / `learningTocIds` / related guide id exists, and `moc.readingOrder` plus the clusters mention each guide id once
 
 ### 7. Verify in the app
 
@@ -247,9 +312,11 @@ php -S localhost:8080
 
 Open `http://localhost:8080/` — lesson should appear (Import or file). Open `lesson.php?v=VIDEO_ID` and spot-check:
 
+- The page opens in **Transcript learning** (table of contents on the left, transcript and diagrams on the right)
 - Chronological | Learning Structure toggle
 - Transcript timestamps seek the player
 - Mermaid **visual breaks** appear inline after the linked segments; Diagrams gallery lists them
+- If `guides` is non-empty, **Guides learning** is enabled. The left list opens the map of content on the right; that map explains how the guides fit and its links open one guide at a time. A guide timestamp seeks the player. If `guides` is missing or empty, Guides learning is grayed out
 - Deep link `?v=&t=&toc=&dg=`
 
 
@@ -308,6 +375,7 @@ The PHP UI (`lesson.php` + Mermaid CDN):
 - Learning TOC covers definitions + mechanisms + examples + takeaways when present
 - Transcript is readable (punctuation cleaned; no raw VTT tags) **and matches the embedded video’s real captions/timemarks**
 - Visualizable concepts have Mermaid entries in `diagrams[]` with `segmentId` + `start` (inline visual breaks)
+- Important concepts have short `guides[]` entries, and `moc` maps every guide once. Omit both when the video has nothing a short guide would help
 - No secrets in the JSON
 
 ## Example user prompt
@@ -322,5 +390,6 @@ The PHP UI (`lesson.php` + Mermaid CDN):
 - [ ] Built chronological TOC
 - [ ] Built learning TOC with categories + source timestamps
 - [ ] Added Mermaid visual breaks (`diagrams[]` with `kind: "mermaid"`, `segmentId`, `start`) for illustratable concepts
+- [ ] Added short concept guides and a map of content when the video has ideas that guides would help; otherwise left `guides` empty
 - [ ] Wrote `data/lessons/{id}.json`
-- [ ] Confirmed file opens in Learnyt UI (dual TOC + Diagrams gallery)
+- [ ] Confirmed file opens in Learnyt UI (Transcript learning by default; Guides learning shows the map of content and guides, or is grayed out when there are no guides)

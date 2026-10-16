@@ -39,6 +39,17 @@ $transcript = $lesson['transcript'] ?? [];
 $chrono = $lesson['chronologicalToc'] ?? [];
 $learn = $lesson['learningToc'] ?? [];
 $diagrams = isset($lesson['diagrams']) && is_array($lesson['diagrams']) ? $lesson['diagrams'] : [];
+$guidePack = lesson_guide_pack($lesson);
+$guides = $guidePack['guides'];
+$guidesById = $guidePack['byId'];
+$moc = $guidePack['moc'];
+$hasGuides = $guidePack['hasGuides'];
+$diagramById = array();
+foreach ($diagrams as $dg) {
+    if (is_array($dg) && isset($dg['id'])) {
+        $diagramById[(string) $dg['id']] = $dg;
+    }
+}
 $title = (string) ($video['title'] ?? $videoId);
 
 $startT = parse_time_param(isset($_GET['t']) ? (string) $_GET['t'] : null);
@@ -160,7 +171,23 @@ layout_header($title, array('nav' => 'home'));
       <?php endif; ?>
     </div>
 
-    <div class="rounded-xl border border-slate-200 bg-white p-4">
+    <div class="rounded-xl border border-slate-200 bg-white p-1.5" id="study-mode-switch">
+      <div class="grid grid-cols-2 gap-1" role="tablist" aria-label="Learning mode">
+        <button type="button" role="tab" id="study-tab-transcript" data-study-mode="transcript" aria-selected="true" aria-controls="transcript-learning-panel transcript-learning"
+          class="study-mode-btn min-h-[2.75rem] rounded-md bg-slate-900 px-2 py-2 text-xs sm:text-sm font-medium leading-snug text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900">
+          Transcript learning
+        </button>
+        <button type="button" role="tab" id="study-tab-guides" data-study-mode="guides" aria-selected="false" aria-controls="guides-learning-panel guides-learning"
+          class="study-mode-btn min-h-[2.75rem] rounded-md px-2 py-2 text-xs sm:text-sm font-medium leading-snug text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900"
+          <?= $hasGuides ? '' : 'disabled' ?>
+          aria-disabled="<?= $hasGuides ? 'false' : 'true' ?>"
+          title="<?= $hasGuides ? 'Guides learning' : 'No concept guides for this lesson' ?>">
+          Guides learning
+        </button>
+      </div>
+    </div>
+
+    <div class="rounded-xl border border-slate-200 bg-white p-4" id="transcript-learning-panel">
       <div class="flex items-center justify-between gap-2 mb-3">
         <h2 class="text-sm font-semibold text-slate-900">Table of contents</h2>
         <div class="inline-flex rounded-lg border border-slate-200 p-0.5 text-xs" role="tablist" aria-label="TOC mode">
@@ -231,6 +258,35 @@ layout_header($title, array('nav' => 'home'));
         </ul>
       </div>
     </div>
+
+    <div class="rounded-xl border border-slate-200 bg-white p-4 hidden" id="guides-learning-panel">
+      <h2 class="text-sm font-semibold text-slate-900 mb-3">Guides</h2>
+      <nav id="moc-nav" class="moc-nav text-sm" aria-label="Guides">
+        <?php if ($hasGuides): ?>
+        <a href="#moc" class="toc-link moc-link block rounded-md px-2 py-1.5 hover:bg-slate-50 text-slate-700" data-guide-id="moc">Map of content</a>
+        <?php foreach ($moc['clusters'] as $cluster): ?>
+        <div class="moc-group">
+          <h3 class="moc-group-label"><?= e((string) ($cluster['title'] ?? 'Guides')) ?></h3>
+          <ul class="moc-group-list">
+            <?php foreach ($cluster['entries'] as $entry):
+              $gid = (string) ($entry['guideId'] ?? '');
+              $linked = $guidesById[$gid] ?? null;
+              if (!$linked) {
+                  continue;
+              }
+            ?>
+            <li>
+              <a href="#guide-<?= e($gid) ?>"
+                 class="toc-link moc-link block rounded-md px-2 py-1.5 hover:bg-slate-50 text-slate-700"
+                 data-guide-id="<?= e($gid) ?>"><?= e((string) ($linked['title'] ?? 'Guide')) ?></a>
+            </li>
+            <?php endforeach; ?>
+          </ul>
+        </div>
+        <?php endforeach; ?>
+        <?php endif; ?>
+      </nav>
+    </div>
   </aside>
 
   <!-- Main reading column -->
@@ -240,6 +296,7 @@ layout_header($title, array('nav' => 'home'));
       Looking for this lesson in browser storage…
     </div>
     <?php endif; ?>
+    <div id="transcript-learning" class="space-y-10">
     <section id="overview-panel" class="rounded-xl border border-slate-200 bg-white p-6 sm:p-8">
       <h2 class="text-lg font-semibold text-slate-900 mb-3">Overview</h2>
       <?php if (!empty($lesson['meta']['summary'])): ?>
@@ -364,6 +421,119 @@ layout_header($title, array('nav' => 'home'));
         <?php endif; ?>
       </ul>
     </section>
+    </div>
+
+    <div id="guides-learning" class="hidden space-y-8">
+      <article id="moc-document" class="guide-card rounded-xl border border-slate-200 bg-white p-6 sm:p-8">
+        <p class="text-xs font-semibold uppercase tracking-wide text-slate-400">Map of content</p>
+        <h2 id="moc-title" class="mt-2 text-xl font-semibold tracking-tight text-slate-900"><?= e((string) ($moc['title'] ?? 'Map of content')) ?></h2>
+        <p id="moc-orientation" class="prose-lesson text-slate-700 leading-relaxed mt-4 <?= trim((string) ($moc['orientation'] ?? '')) === '' ? 'hidden' : '' ?>"><?= e((string) ($moc['orientation'] ?? '')) ?></p>
+        <div id="moc-body" class="mt-8 space-y-8">
+          <?php foreach ($moc['clusters'] as $cluster): ?>
+          <section>
+            <h3 class="text-base font-semibold text-slate-900"><?= e((string) ($cluster['title'] ?? 'Guides')) ?></h3>
+            <?php if (trim((string) ($cluster['blurb'] ?? '')) !== ''): ?>
+            <p class="mt-2 text-slate-600 leading-relaxed"><?= e((string) $cluster['blurb']) ?></p>
+            <?php endif; ?>
+            <ul class="mt-3 space-y-3">
+              <?php foreach ($cluster['entries'] as $entry):
+                $gid = (string) ($entry['guideId'] ?? '');
+                $linked = $guidesById[$gid] ?? null;
+                if (!$linked) {
+                    continue;
+                }
+              ?>
+              <li>
+                <a href="#guide-<?= e($gid) ?>" class="font-medium text-slate-900 underline underline-offset-2 hover:text-slate-600" data-guide-id="<?= e($gid) ?>"><?= e((string) ($linked['title'] ?? 'Guide')) ?></a>
+                <?php if (trim((string) ($entry['why'] ?? '')) !== ''): ?>
+                <p class="mt-1 text-sm text-slate-600 leading-relaxed"><?= e((string) $entry['why']) ?></p>
+                <?php endif; ?>
+              </li>
+              <?php endforeach; ?>
+            </ul>
+          </section>
+          <?php endforeach; ?>
+        </div>
+      </article>
+      <div id="guide-articles" class="space-y-8">
+        <?php foreach ($guides as $guide):
+          $gid = (string) ($guide['id'] ?? '');
+          $sources = isset($guide['sources']) && is_array($guide['sources']) ? $guide['sources'] : array();
+          $diagramIds = isset($guide['diagramIds']) && is_array($guide['diagramIds']) ? $guide['diagramIds'] : array();
+          $prereqIds = isset($guide['prerequisiteGuideIds']) && is_array($guide['prerequisiteGuideIds']) ? $guide['prerequisiteGuideIds'] : array();
+          $relatedIds = isset($guide['relatedGuideIds']) && is_array($guide['relatedGuideIds']) ? $guide['relatedGuideIds'] : array();
+          $body = trim((string) ($guide['body'] ?? ''));
+          $paragraphs = $body === '' ? array() : preg_split("/\n\s*\n/", $body);
+          if (!is_array($paragraphs)) {
+              $paragraphs = array($body);
+          }
+        ?>
+        <article id="guide-<?= e($gid) ?>" class="guide-card hidden rounded-xl border border-slate-200 bg-white p-6 sm:p-8" data-guide-id="<?= e($gid) ?>">
+          <p class="mb-4"><a href="#moc" class="text-sm text-slate-500 underline underline-offset-2 hover:text-slate-800" data-guide-id="moc">Map of content</a></p>
+          <p class="text-xs font-semibold uppercase tracking-wide text-slate-400"><?= e(category_label(isset($guide['category']) ? (string) $guide['category'] : null)) ?></p>
+          <h2 class="mt-2 text-xl font-semibold tracking-tight text-slate-900"><?= e((string) ($guide['title'] ?? 'Guide')) ?></h2>
+          <?php if (trim((string) ($guide['oneSentence'] ?? '')) !== ''): ?>
+          <p class="mt-3 text-lg text-slate-800 leading-relaxed"><?= e((string) $guide['oneSentence']) ?></p>
+          <?php endif; ?>
+          <?php foreach ($paragraphs as $paragraph): ?>
+          <p class="prose-lesson text-slate-700 leading-relaxed mt-4"><?= e(trim((string) $paragraph)) ?></p>
+          <?php endforeach; ?>
+          <?php foreach ($diagramIds as $diagramId):
+            $diagramId = (string) $diagramId;
+            if (!isset($diagramById[$diagramId])) {
+                continue;
+            }
+            render_diagram_card($diagramById[$diagramId], $videoId, array(
+                'context' => 'inline',
+                'domId' => 'gdg-' . $gid . '-' . $diagramId,
+            ));
+          endforeach; ?>
+          <?php if (count($sources) > 0): ?>
+          <div class="mt-5 flex flex-wrap items-center gap-2 text-sm">
+            <span class="text-xs font-semibold uppercase tracking-wide text-slate-400">In the video</span>
+            <?php foreach ($sources as $src):
+              if (!is_array($src)) {
+                  continue;
+              }
+              $st = (float) ($src['start'] ?? 0);
+              $en = (float) ($src['end'] ?? $st);
+            ?>
+            <button type="button" class="rounded-md border border-slate-200 px-2 py-1 text-slate-700 hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900" data-seek="<?= $st ?>" data-end="<?= $en ?>">
+              <?= e(format_time((int) $st)) ?><?php if ($en > $st): ?>–<?= e(format_time((int) $en)) ?><?php endif; ?>
+            </button>
+            <?php endforeach; ?>
+          </div>
+          <?php endif; ?>
+          <?php
+            $linkRows = array(
+                'Read first' => $prereqIds,
+                'Related' => $relatedIds,
+            );
+          ?>
+          <?php foreach ($linkRows as $label => $ids):
+            $present = array();
+            foreach ($ids as $otherId) {
+                $otherId = (string) $otherId;
+                if (isset($guidesById[$otherId])) {
+                    $present[] = $otherId;
+                }
+            }
+            if (count($present) === 0) {
+                continue;
+            }
+          ?>
+          <p class="mt-3 text-sm text-slate-600">
+            <span class="font-medium text-slate-800"><?= e($label) ?>:</span>
+            <?php foreach ($present as $i => $otherId): ?>
+            <?php if ($i > 0): ?>, <?php endif; ?>
+            <a href="#guide-<?= e($otherId) ?>" class="underline hover:text-slate-900" data-guide-id="<?= e($otherId) ?>"><?= e((string) ($guidesById[$otherId]['title'] ?? $otherId)) ?></a>
+            <?php endforeach; ?>
+          </p>
+          <?php endforeach; ?>
+        </article>
+        <?php endforeach; ?>
+      </div>
+    </div>
   </div>
 </div>
 

@@ -93,6 +93,8 @@
     if (!Array.isArray(lesson.chronologicalToc)) lesson.chronologicalToc = [];
     if (!Array.isArray(lesson.learningToc)) lesson.learningToc = [];
     if (!Array.isArray(lesson.diagrams)) lesson.diagrams = [];
+    if (lesson.guides != null && !Array.isArray(lesson.guides)) lesson.guides = [];
+    if (lesson.moc != null && (typeof lesson.moc !== 'object' || Array.isArray(lesson.moc))) lesson.moc = {};
     if (!lesson.meta || typeof lesson.meta !== 'object') lesson.meta = {};
     lesson.meta.updatedAt = new Date().toISOString();
     lesson.meta.importedAt = lesson.meta.importedAt || new Date().toISOString();
@@ -608,6 +610,8 @@
       list.innerHTML = html || '<p class="p-6 text-slate-500">No transcript segments.</p>';
     }
 
+    renderLocalGuides(lesson);
+
     // Diagram gallery
     var gallery = document.getElementById('diagram-gallery');
     var diagramsSection = document.getElementById('diagrams');
@@ -727,7 +731,192 @@
     return true;
   }
 
-  function diagramCardHtml(dg, videoId, context) {
+  var GUIDE_CATEGORY_LABELS = {
+    concept: 'Core concepts',
+    definition: 'Definitions',
+    prerequisite: 'Prerequisites',
+    argument: 'Arguments',
+    mechanism: 'Mechanisms',
+    example: 'Examples',
+    application: 'Applications',
+    mistake: 'Common mistakes',
+    takeaway: 'Takeaways',
+    other: 'Other',
+  };
+
+  function guidePack(lesson) {
+    var raw = Array.isArray(lesson.guides) ? lesson.guides : [];
+    var byId = {};
+    raw.forEach(function (guide) {
+      if (!guide || !guide.id || !guide.title || byId[guide.id]) return;
+      byId[String(guide.id)] = guide;
+    });
+    var moc = lesson.moc && typeof lesson.moc === 'object' ? lesson.moc : {};
+    var clusters = [];
+    var seen = {};
+    (Array.isArray(moc.clusters) ? moc.clusters : []).forEach(function (cluster) {
+      if (!cluster) return;
+      var entries = [];
+      (Array.isArray(cluster.entries) ? cluster.entries : []).forEach(function (entry) {
+        var gid = entry && entry.guideId ? String(entry.guideId) : '';
+        if (!gid || !byId[gid] || seen[gid]) return;
+        seen[gid] = true;
+        entries.push(entry);
+      });
+      if (!entries.length) return;
+      clusters.push({
+        id: cluster.id || '',
+        title: cluster.title || 'Guides',
+        blurb: cluster.blurb || '',
+        entries: entries,
+      });
+    });
+    var missing = [];
+    Object.keys(byId).forEach(function (gid) {
+      if (seen[gid]) return;
+      missing.push({ guideId: gid, why: byId[gid].oneSentence || '' });
+    });
+    if (missing.length) {
+      clusters.push({
+        id: 'mc-rest',
+        title: clusters.length ? 'Also in this lesson' : 'Guides',
+        blurb: '',
+        entries: missing,
+      });
+    }
+    var reading = [];
+    var used = {};
+    (Array.isArray(moc.readingOrder) ? moc.readingOrder : []).forEach(function (gid) {
+      gid = String(gid);
+      if (byId[gid] && !used[gid]) {
+        reading.push(gid);
+        used[gid] = true;
+      }
+    });
+    clusters.forEach(function (cluster) {
+      cluster.entries.forEach(function (entry) {
+        var gid = String(entry.guideId);
+        if (!used[gid]) {
+          reading.push(gid);
+          used[gid] = true;
+        }
+      });
+    });
+    return {
+      byId: byId,
+      guides: reading.map(function (gid) { return byId[gid]; }),
+      moc: {
+        title: moc.title || 'Map of content',
+        orientation: moc.orientation || '',
+        clusters: clusters,
+      },
+    };
+  }
+
+  function renderLocalGuides(lesson) {
+    var packed = guidePack(lesson);
+    var has = packed.guides.length > 0;
+    var btn = document.getElementById('study-tab-guides');
+    if (btn) {
+      btn.disabled = !has;
+      btn.setAttribute('aria-disabled', has ? 'false' : 'true');
+      btn.title = has ? 'Guides learning' : 'No concept guides for this lesson';
+    }
+    var navEl = document.getElementById('moc-nav');
+    if (navEl) {
+      var nav = has
+        ? '<a href="#moc" class="toc-link moc-link block rounded-md px-2 py-1.5 hover:bg-slate-50 text-slate-700" data-guide-id="moc">Map of content</a>'
+        : '';
+      nav += packed.moc.clusters.map(function (cluster) {
+        var items = cluster.entries.map(function (entry) {
+          var guide = packed.byId[entry.guideId];
+          if (!guide) return '';
+          return (
+            '<li><a href="#guide-' + escapeHtml(guide.id) + '" class="toc-link moc-link block rounded-md px-2 py-1.5 hover:bg-slate-50 text-slate-700" data-guide-id="' +
+            escapeHtml(guide.id) + '">' + escapeHtml(guide.title) + '</a></li>'
+          );
+        }).join('');
+        return (
+          '<div class="moc-group"><h3 class="moc-group-label">' +
+          escapeHtml(cluster.title || 'Guides') + '</h3><ul class="moc-group-list">' + items + '</ul></div>'
+        );
+      }).join('');
+      navEl.innerHTML = nav;
+    }
+    var titleEl = document.getElementById('moc-title');
+    if (titleEl) titleEl.textContent = packed.moc.title || 'Map of content';
+    var orientationEl = document.getElementById('moc-orientation');
+    if (orientationEl) {
+      orientationEl.textContent = packed.moc.orientation || '';
+      orientationEl.classList.toggle('hidden', !packed.moc.orientation);
+    }
+    var bodyEl = document.getElementById('moc-body');
+    if (bodyEl) {
+      bodyEl.innerHTML = packed.moc.clusters.map(function (cluster) {
+        var items = cluster.entries.map(function (entry) {
+          var guide = packed.byId[entry.guideId];
+          if (!guide) return '';
+          return (
+            '<li><a href="#guide-' + escapeHtml(guide.id) + '" class="font-medium text-slate-900 underline underline-offset-2 hover:text-slate-600" data-guide-id="' +
+            escapeHtml(guide.id) + '">' + escapeHtml(guide.title) + '</a>' +
+            (entry.why ? '<p class="mt-1 text-sm text-slate-600 leading-relaxed">' + escapeHtml(entry.why) + '</p>' : '') +
+            '</li>'
+          );
+        }).join('');
+        return (
+          '<section><h3 class="text-base font-semibold text-slate-900">' + escapeHtml(cluster.title || 'Guides') + '</h3>' +
+          (cluster.blurb ? '<p class="mt-2 text-slate-600 leading-relaxed">' + escapeHtml(cluster.blurb) + '</p>' : '') +
+          '<ul class="mt-3 space-y-3">' + items + '</ul></section>'
+        );
+      }).join('');
+    }
+    var articlesEl = document.getElementById('guide-articles');
+    if (!articlesEl) return;
+    var diagrams = {};
+    (lesson.diagrams || []).forEach(function (dg) {
+      if (dg && dg.id) diagrams[dg.id] = dg;
+    });
+    articlesEl.innerHTML = packed.guides.map(function (guide) {
+      var cat = GUIDE_CATEGORY_LABELS[guide.category] || (guide.category ? guide.category : 'Topic');
+      var paragraphs = String(guide.body || '').split(/\n\s*\n/).filter(function (p) { return p.trim(); });
+      var bodyHtml = paragraphs.map(function (p) {
+        return '<p class="prose-lesson text-slate-700 leading-relaxed mt-4">' + escapeHtml(p.trim()) + '</p>';
+      }).join('');
+      var visuals = (guide.diagramIds || []).map(function (diagramId) {
+        var dg = diagrams[diagramId];
+        if (!dg) return '';
+        return diagramCardHtml(dg, (window.LEARNYT && window.LEARNYT.videoId) || '', 'inline', 'gdg-' + guide.id + '-' + dg.id);
+      }).join('');
+      var sources = (guide.sources || []).map(function (src) {
+        var st = src.start || 0;
+        var en = src.end != null ? src.end : st;
+        return '<button type="button" class="rounded-md border border-slate-200 px-2 py-1 text-slate-700 hover:bg-slate-50" data-seek="' +
+          st + '" data-end="' + en + '">' + formatTime(st) + (en > st ? '–' + formatTime(en) : '') + '</button>';
+      }).join('');
+      function guideLinks(label, ids) {
+        var present = (ids || []).filter(function (id) { return packed.byId[id]; });
+        if (!present.length) return '';
+        return '<p class="mt-3 text-sm text-slate-600"><span class="font-medium text-slate-800">' + escapeHtml(label) + ':</span> ' +
+          present.map(function (id) {
+            return '<a href="#guide-' + escapeHtml(id) + '" class="underline hover:text-slate-900" data-guide-id="' +
+              escapeHtml(id) + '">' + escapeHtml(packed.byId[id].title) + '</a>';
+          }).join(', ') + '</p>';
+      }
+      return (
+        '<article id="guide-' + escapeHtml(guide.id) + '" class="guide-card hidden rounded-xl border border-slate-200 bg-white p-6 sm:p-8" data-guide-id="' +
+        escapeHtml(guide.id) + '"><p class="mb-4"><a href="#moc" class="text-sm text-slate-500 underline underline-offset-2 hover:text-slate-800" data-guide-id="moc">Map of content</a></p><p class="text-xs font-semibold uppercase tracking-wide text-slate-400">' + escapeHtml(cat) +
+        '</p><h2 class="mt-2 text-xl font-semibold tracking-tight text-slate-900">' + escapeHtml(guide.title) + '</h2>' +
+        (guide.oneSentence ? '<p class="mt-3 text-lg text-slate-800 leading-relaxed">' + escapeHtml(guide.oneSentence) + '</p>' : '') +
+        bodyHtml + visuals +
+        (sources ? '<div class="mt-5 flex flex-wrap items-center gap-2 text-sm"><span class="text-xs font-semibold uppercase tracking-wide text-slate-400">In the video</span>' + sources + '</div>' : '') +
+        guideLinks('Read first', guide.prerequisiteGuideIds) +
+        guideLinks('Related', guide.relatedGuideIds) +
+        '</article>'
+      );
+    }).join('');
+  }
+
+  function diagramCardHtml(dg, videoId, context, domId) {
     var id = dg.id || '';
     var title = dg.title || 'Diagram';
     var caption = dg.caption || '';
@@ -748,8 +937,8 @@
       body = '<p class="text-sm text-slate-500">No diagram payload.</p>';
     }
     return (
-      '<figure id="dg-' +
-      escapeHtml(id) +
+      '<figure id="' +
+      escapeHtml(domId || ('dg-' + id)) +
       '" class="' +
       wrap +
       '" data-diagram-id="' +

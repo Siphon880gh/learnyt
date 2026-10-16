@@ -96,6 +96,15 @@ Lessons include a `diagrams` array. The **youtube-lesson skill should emit Merma
 - A **Diagrams** gallery lists all visuals; each jumps to the transcript + video timestamp
 - Deep link: `lesson.php?v=VIDEO_ID&dg=d1&t=62`
 
+## Concept guides
+
+When a lesson includes `guides` and a `moc` (map of content), the lesson page can switch on the left:
+
+- **Transcript learning** — table of contents on the left; transcript and visual diagrams on the right. This is the view that loads first.
+- **Guides learning** — map of content on the left; short concept guides on the right.
+
+If the lesson has no guides, Guides learning is grayed out.
+
 ## Highlights & SRS
 
 - Highlights: `data/highlights/{videoId}.json` via selection toolbar  
