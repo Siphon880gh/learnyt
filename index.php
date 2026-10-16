@@ -51,7 +51,7 @@ layout_header('Home', array('nav' => 'home'));
     <strong class="font-medium text-slate-800">Sync to demo</strong> so any visitor of this app can open it.
   </p>
 
-  <div class="flex flex-wrap gap-3 mb-10">
+  <div class="flex flex-wrap gap-3 mt-8 mb-10">
     <a href="#workflow" class="inline-flex items-center justify-center rounded-lg bg-slate-900 px-5 py-3 text-sm font-medium text-white hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-slate-900 focus-visible:ring-offset-2">
       Open in AI harness → paste YouTube URL
     </a>
